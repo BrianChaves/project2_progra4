@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div layout:fragment="maincontent">
+   <div class="row col-8 mb-0 pb-0 ps-0">
+        <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/insurance}">All Insurances</a>
+   </div>
+    <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+        <div class="card-title mt-2">
+            <h4 class="text-center">Insurance Details</h4>
+            <img th:if="${insurance.vehicle.carImage != null}" th:src="@{'/vehicle/image/' + ${insurance.vehicle.id}}" alt="" style="width: 100px;" />
+
+        </div>
+        <div class="card-body row col-12 justify-content-center">
+            <div class="col-10" th:object="${insurance}">
+                <p>NumberPlate: <span th:text="${insurance.numberPlate}"> None</span></p>
+                <p>Model-Brand-Year: <span th:text="${insurance.getInfoVehicle()}">None</span></p>
+                <p>Valuation: <span th:text="${insurance.valuation}">None</span></p>
+                <p>Name: <span th:text="${insurance.client.name}">None</span></p>
+                <p>Acquired Coverages</p>
+                <ul>
+                    <li th:each="coverage : ${insurance.coverages}" th:text="${coverage.name}"></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-primary col-4 m-3" data-bs-toggle="modal" data-bs-target="#formModal">
+                Update
+            </button>
+            <button type="button" class="btn btn-danger col-4 m-3" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+            <div th:insert="~{insurance/form :: insurance_form}"></div>
+            <div th:insert="~{insurance/preview_quote_modal :: quote_modal}"></div>
+            <div th:insert="~{insurance/confirm_delete_modal :: delete_modal}"></div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="extra_scripts">
+    <script type="application/javascript" th:src="@{/js/preview_quote.js}"></script>
+</div>
+</body>
+</html>

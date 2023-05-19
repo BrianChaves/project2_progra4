@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html
+    lang="en"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Logout</title>
+</head>
+<body>
+    <div layout:fragment="maincontent">
+        <div class="card row col-6 justify-content-center bg-light shadow-sm py-5">
+            <div class="card-body">
+                <form method="post" th:action='@{/auth/logout}' class="row col-12 justify-content-center">
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <div class="row col-12 justify-content-center">
+                        <div class="col-12 fs-5 text-center mb-2">Are you sure you want to log out?</div>
+                        <input type="submit" class="btn btn-lg col-4 btn-danger fw-bold mb-2" value="Log Out">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

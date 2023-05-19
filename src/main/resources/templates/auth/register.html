@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html
+    lang="en"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <div layout:fragment="maincontent">
+        <div class="card row col-8 justify-content-center bg-light shadow-sm my-5">
+            <div class="card-body">
+                <form method="post" th:action='@{/auth/register}' class="row col-12 justify-content-center" th:object="${userRegisterHelper}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="row col-6 justify-content-center border-2 border-end">
+                        <h4 class="col-8 mt-3 ms-3">Profile Information</h4>
+                        <div class="col-8">
+                            <label for="username" class="form-label col-12 fw-bold my-auto">Username</label>
+                            <input id="username" name="username" type="text" class="form-control d-inline" th:field="*{username}"/>
+                            <ul th:if="${#fields.hasErrors('username')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('username')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="passwordHash" class="form-label col-12 fw-bold my-auto">Password</label>
+                            <input id="passwordHash" name="passwordHash" type="password" class="form-control d-inline" th:field="*{passwordHash}"/>
+                            <ul th:if="${#fields.hasErrors('passwordHash')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('passwordHash')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="password2" class="form-label col-12 fw-bold my-auto">Password (again)</label>
+                            <input id="password2" name="password2" type="password" class="form-control d-inline" />
+                        </div>
+                        <div class="col-8">
+                            <label for="name" class="form-label col-12 fw-bold my-auto">Name</label>
+                            <input id="name" name="name" type="text" class="form-control d-inline" th:field="*{name}"/>
+                            <ul th:if="${#fields.hasErrors('name')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('name')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="phoneNumber" class="form-label col-12 fw-bold my-auto">Phone Number</label>
+                            <input id="phoneNumber" name="phoneNumber" type="text" class="form-control d-inline" th:field="*{phoneNumber}"/>
+                            <ul th:if="${#fields.hasErrors('phoneNumber')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('phoneNumber')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="email" class="form-label col-12 fw-bold my-auto">Email</label>
+                            <input id="email" name="email" type="text" class="form-control d-inline" th:field="*{email}"/>
+                            <ul th:if="${#fields.hasErrors('email')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('email')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row col-6 justify-content-center">
+                        <h4 class="col-8 mt-3 ms-3">Payment Information</h4>
+                        <div class="col-8">
+                            <label for="number" class="form-label col-12 fw-bold my-auto">Card Number</label>
+                            <input id="number" name="number" type="text" class="form-control d-inline" th:field="*{number}"/>
+                            <ul th:if="${#fields.hasErrors('number')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('number')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="owner" class="form-label col-12 fw-bold my-auto">Name (In card)</label>
+                            <input id="owner" name="owner" type="text" class="form-control d-inline" th:field="*{owner}"/>
+                            <ul th:if="${#fields.hasErrors('owner')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('owner')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="expirationDate" class="form-label col-12 fw-bold my-auto">Expiration Date</label>
+                            <input id="expirationDate" name="expirationDate" type="text" class="form-control d-inline" th:field="*{expirationDate}"/>
+                            <ul th:if="${#fields.hasErrors('expirationDate')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('expirationDate')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="securityCode" class="form-label col-12 fw-bold my-auto">Security Code (CVV)</label>
+                            <input id="securityCode" name="securityCode" type="text" class="form-control d-inline" th:field="*{securityCode}"/>
+                            <ul th:if="${#fields.hasErrors('securityCode')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('securityCode')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <label for="billingAddress" class="form-label col-12 fw-bold my-auto">Billing Address</label>
+                            <textarea id="billingAddress" name="billingAddress" class="form-control d-inline" th:field="*{billingAddress}"></textarea>
+                            <ul th:if="${#fields.hasErrors('billingAddress')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('billingAddress')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 row justify-content-center mt-3">
+                        <input type="submit" class="btn btn-lg btn-primary col-5 mb-2" value="Register">
+                        <span class="col-12 text-center"> Or <a class="link-secondary" th:href="@{/auth/login}">log in</a> if you already have an account</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

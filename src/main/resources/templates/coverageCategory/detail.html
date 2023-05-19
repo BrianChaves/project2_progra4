@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Category Detail</title>
+</head>
+<body>
+<div layout:fragment="maincontent">
+    <div class="row col-8 mb-0 pb-0 ps-0">
+        <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/coverage/category}">All Categories</a>
+    </div>
+    <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+        <div class="card-title mt-2">
+            <h4 class="text-center">Category Details</h4>
+        </div>
+        <div class="card-body row col-12 justify-content-center">
+            <div class="col-10" th:object="${coverageCategory}">
+                <p>Name: <span th:text="${coverageCategory.name}">None</span></p>
+                <p>Description:</p>
+                <p class="ms-2" th:text="${coverageCategory.description}">None</p>
+                <p>Coverages:</p>
+                <ul>
+                    <li th:each="coverage: ${coverageCategory.coverages}" th:text="${coverage.name}"></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-primary col-4 m-3" data-bs-toggle="modal" data-bs-target="#formModal">
+                Update
+            </button>
+            <button type="button" class="btn btn-danger col-4 m-3" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+            <div th:insert="~{coverageCategory/form :: coverageCategory_form}"></div>
+            <div th:insert="~{coverageCategory/confirm_delete_modal :: delete_modal}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

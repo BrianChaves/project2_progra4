@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html
+    lang="en"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <div layout:fragment="maincontent">
+        <div class="card row col-6 justify-content-center bg-light shadow-sm py-5">
+            <div class="card-body">
+                <form method="post" th:action='@{/auth/login}' class="row col-12 justify-content-center">
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <div class="row col-8 justify-content-center mb-2">
+                        <label for="username" class="form-label col-auto fw-bold my-auto">
+                            Username
+                        </label>
+                        <input id="username" name="username" type="text"  class="form-control d-inline w-50"/>
+                    </div>
+                    <div class="row col-8 justify-content-center mb-2">
+                        <label for="password" class="form-label col-auto fw-bold my-auto">
+                            Password
+                        </label>
+                        <input id="password" name="password" type="password"  class="form-control d-inline w-50"/>
+                    </div>
+                    <div class="row col-12 justify-content-center">
+                        <div class="col-12" th:if="${param.error != null}">
+                            <p class="text-center">Invalid credentials, please try again.</p>
+                        </div>
+                    </div>
+                    <div class="row col-12 justify-content-center">
+                        <input type="submit" class="btn btn-lg col-4 btn-primary fw-bold mb-2" value="Log In">
+                        <div class="col-12 text-center">Not registered yet? <a th:href="@{/auth/register}" class="link-secondary"> Register here!</a></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

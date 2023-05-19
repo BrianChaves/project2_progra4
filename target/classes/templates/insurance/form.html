@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Add Insurance</title>
+</head>
+<body>
+<div th:fragment="insurance_form">
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="insurance_form" method="post" th:action="@{${insurance.id != null ? '/insurance/'+insurance.numberPlate : '/insurance'}}" th:object="${insurance}" class="row col-12 justify-content-center m-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formModalLabel" th:text="@{${insurance.id != null ? 'Update Insurance' : 'Create Insurance' }}">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <div>
+                            <label for="numberPlate" class="form-label col-12 fw-bold my-auto">Number Plate</label>
+                            <input id="numberPlate" name="numberPlate" type="text" class="form-control" th:field="*{numberPlate}"/>
+                            <ul th:if="${#fields.hasErrors('numberPlate')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('numberPlate')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <br>
+                            <label for="carYear" class="form-label col-12 fw-bold my-auto">Year</label>
+                            <input id="carYear" name="carYear" type="number" min="1990" max="2023" step="1" th:value="1990" class="form-control" th:field="*{carYear}" />
+                            <ul th:if="${#fields.hasErrors('carYear')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('carYear')}" th:text="${err}" class="error"></li>
+                            </ul>
+                            <br>
+                        </div>
+                        <div>
+                            <label for="vehicle" class="form-label col-12 fw-bold my-auto">Brand-Model</label>
+                            <select id="vehicle" name="vehicle" class="form-select d-inline" th:field="*{vehicle}">
+                                <option th:each="vehicle : ${vehicles}" th:value="${vehicle.id}" th:text="${vehicle.brand} + ' ' + ${vehicle.model}" th:attr="data-text=${vehicle.brand} + ' ' + ${vehicle.model}"></option>
+                            </select>
+                            <ul th:if="${#fields.hasErrors('vehicle')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('vehicle')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label for="valuation" class="form-label col-12 fw-bold my-auto">Value</label>
+                            <input id="valuation" name="valuation" type="text" class="form-control" th:field="*{valuation}" />
+                            <ul th:if="${#fields.hasErrors('valuation')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('valuation')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label for="paymentSchedule" class="form-label col-12 fw-bold my-auto">Payment Method</label>
+                            <select id="paymentSchedule" name="paymentSchedule" class="form-select d-inline" th:field="*{paymentSchedule}">
+                                <option th:each="paymentSchedule : ${paymentSchedules}" th:value="${paymentSchedule.id}" th:text="${paymentSchedule.name}" th:attr="data-text=${paymentSchedule.name}"></option>
+                            </select>
+                            <ul th:if="${#fields.hasErrors('paymentSchedule')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('paymentSchedule')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div class="row col-12 justify-content-center">
+                            <div class="col-12" th:if="${param.error != null}">
+                                <p class="text-center">Invalid credentials, please try again.</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div>
+                            <label for="payment" class="form-label col-12 fw-bold my-auto">Cards</label>
+                            <select id="payment" name="payment" class="form-select d-inline" th:field="*{payment}" >
+                                <option th:each="payment : ${payments}" th:value="${payment.id}" th:text="${payment.safeNumber} + ' (' + ${payment.owner} + ')'" th:attr="data-text=${payment.safeNumber} + ' (' + ${payment.owner} + ')'"></option>
+                            </select>
+                            <ul th:if="${#fields.hasErrors('payment')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('payment')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <h5>Coverages</h5>
+                        <div class="row col-12 justify-content=between">
+                            <div th:each="coverage : ${coverages}" class="col-4">
+                                <input class="form-check-input" type="checkbox" name="coverages" th:field="*{coverages}" th:id="'coverage_'+${coverage.id}" th:value="${coverage.id}"  th:attr="data-name=${coverage.name}, data-minprice=${coverage.minimumPrice}, data-percentage=${coverage.valuationPercentagePrice}" >
+                                <label class="form-check-label" th:for="'coverage_'+${coverage.id}" th:text="${coverage.name}"> </label>
+                                <ul th:if="${#fields.hasErrors('coverages')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                    <li th:each="err : ${#fields.errors('coverages')}" th:text="${err}" class="error"></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row col-12 justify-content-center mt-3">
+                            <a id="preview_modal" href="#" class="btn btn-lg col-4 btn-primary fw-bold mb-2" data-bs-toggle="modal" data-bs-target="#previewModal" data-bs-dismiss="modal">Preview Insurance</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

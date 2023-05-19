@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Detail</title>
+</head>
+<body>
+<div layout:fragment="maincontent">
+    <div class="row col-8 mb-0 pb-0 ps-0">
+        <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/payment}">All Payments</a>
+    </div>
+    <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+        <div class="card-title mt-2">
+            <h4 class="text-center">Payment Details</h4>
+        </div>
+        <div class="card-body row col-12 justify-content-center">
+            <div class="col-10" th:object="${payment}">
+                <p>Number: <span th:text="${payment.getSafeNumber}"> None</span></p>
+                <p>Owner: <span th:text="${payment.owner}">None</span></p>
+                <p>Epiration Date: <span th:text="${payment.expirationDate}">None</span></p>
+                <p>Billing Address: <span th:text="${payment.billingAddress}">None</span></p>
+            </div>
+            <button type="button" class="btn btn-primary col-4 m-3" data-bs-toggle="modal" data-bs-target="#formModal">
+                Update
+            </button>
+            <button type="button" class="btn btn-danger col-4 m-3" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+            <div th:insert="~{payment/form :: payment_form}"></div>
+            <div th:insert="~{payment/confirm_delete_modal :: delete_modal}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

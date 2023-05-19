@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'User Detail' + ${user.username}">User Detail</title>
+</head>
+<body>
+    <div layout:fragment="maincontent">
+<!--        <div class="row col-8 mb-0 pb-0 ps-0">-->
+<!--            <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/payment}">All Payments</a>-->
+<!--        </div>-->
+        <div class="row col-8 mb-0 pb-0 ps-0" sec:authorize="hasAuthority('StandardClient')">
+            <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/}">Dashboard</a>
+        </div>
+        <div class="row col-8 mb-0 pb-0 ps-0" sec:authorize="hasAuthority('AdministratorClient')">
+            <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/user}">All Users</a>
+        </div>
+        <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+            <div class="card-title mt-2">
+                <h4 class="text-center">User Details</h4>
+            </div>
+            <div class="card-body row col-12 justify-content-center">
+                <div class="col-10" th:object="${user}">
+                    <p>Username: <span th:text="*{username}"></span></p>
+                    <p>Name: <span th:text="*{name}"></span></p>
+                    <p>Phone Number: <span th:text="${user.phoneNumber.isBlank ? 'None' : user.phoneNumber}"></span></p>
+                    <p>Email: <span th:text="${user.email.isBlank ? 'None' : user.email}"></span></p>
+                    <p>Roles:</p>
+                    <ul>
+                        <li th:each="role : *{roles}" th:text="${role.name}"></li>
+                    </ul>
+                    <div th:if="*{#lists.size(payments) != 0}">
+                        <p>Payments:</p>
+                        <div class="ps-2" th:each="payment : *{payments}">
+                            <span th:text="'Owner: '+${payment.owner} + ' | '"></span>
+                            <span th:text="'Number: '+${payment.getSafeNumber} + ' | '"></span>
+                            <span th:text="'Expiration Date: '+${payment.expirationDate} + ' | '"></span>
+                            <div>Billing Address:</div>
+                            <div class="ps-3" th:text="${payment.billingAddress}"></div>
+                            <hr/>
+                        </div>
+                    </div>
+                    <div>
+                        <p>Acquired Insurances:</p>
+                        <div class="ps-2" th:each="insurance : ${insurances}">
+                            <p>Car Details</p>
+                            <div class="ps-2">
+                                <div th:text="'Number Plate: '+${insurance.numberPlate}"></div>
+                                <div th:text="'Model: '+ ${insurance.carYear} + ' ' +${insurance.vehicle.brand} + ' ' + ${insurance.vehicle.model}"></div>
+                                <div th:text="'Valuation: '+${insurance.valuation}"></div>
+                                <div th:text="'Payment Schedule: '+${insurance.paymentSchedule.name}"></div>
+                                <div th:text="'Payment Method: '+${insurance.payment.safeNumber} + ' (' + ${insurance.payment.owner} + ')'"></div>
+                            </div>
+                            <p>Acquired Coverages</p>
+                            <ul>
+                                <li th:each="coverage : ${insurance.coverages}" th:text="${coverage.name}"></li>
+                            </ul>
+                            <hr/>
+                        </div>
+                    </div>
+                    <div class="row col-12 justify-content-center">
+                        <button type="button" class="btn btn-primary col-3 m-2" data-bs-toggle="modal" data-bs-target="#updateModal">
+                            Update
+                        </button>
+                        <a type="button" class="btn btn-secondary col-3 m-2" th:href="@{/user/{username}/change_password(username = *{username})}" th:if="${user.username == #authentication.name}">
+                            Change Password
+                        </a>
+                        <button type="button" class="btn btn-danger col-3 m-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            Delete
+                        </button>
+                    </div>
+                    <div th:insert="~{user/update_form :: user_form}"></div>
+                    <div th:insert="~{user/confirm_delete_modal :: delete_modal}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

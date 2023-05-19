@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{generic/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehicle List</title>
+</head>
+<body>
+<div layout:fragment="maincontent">
+    <div class="row col-9 justify-content-end mb-0 pb-0 pe-0">
+        <a class="btn btn-primary col-auto rounded-0 rounded-top" data-bs-toggle="modal" data-bs-target="#formModal" href="#">Add Vehicle</a>
+    </div>
+    <div class="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
+        <div class="card-title ps-2 mt-3">
+            <h4>All Vehicles</h4>
+        </div>
+        <div class="card-body px-4">
+            <table class="table table-striped table-hover">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Model</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="vehicle : ${vehicles}">
+                    <td th:text="${vehicle.id}">None</td>
+                    <td th:text="${vehicle.brand}">None</td>
+                    <td th:text="${vehicle.model}">None</td>
+                    <td>
+                        <img th:if="${vehicle.carImage != null}" th:src="@{'/vehicle/image/' + ${vehicle.id}}" alt="" style="width: 100px;" />
+                    </td>
+                    <th scope="row"><a class="link-secondary" th:href="@{/vehicle/{vehicle}(vehicle = ${vehicle.id})}">View Details</a></th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div th:insert="~{vehicle/form :: vehicle_form}"></div>
+    <div th:insert="~{vehicle/confirm_delete_modal :: delete_modal}"></div>
+
+</div>
+</body>
+</html>

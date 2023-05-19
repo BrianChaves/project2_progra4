@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div layout:fragment="maincontent">
+    <div class="row col-8 mb-0 pb-0 ps-0">
+
+        <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/coverage}">All Coverages</a>
+    </div>
+
+
+    <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+        <div class="card-title mt-2">
+            <h4 class="text-center">Coverage Details</h4>
+
+        </div>
+        <div class="card-body row col-12 justify-content-center">
+            <div class="col-10" th:object="${coverage}">
+                <p>Name: <span th:text="${coverage.name}"> None</span></p>
+                <p>Description: <span th:text="${coverage.description}">None</span></p>
+                <p>Minimun Price: <span th:text="${coverage.minimumPrice}">None</span></p>
+                <p>Percentage Price: <span th:text="${coverage.valuationPercentagePrice}">None</span></p>
+                <p>Category: <span th:text="${coverage.coverageCategory.name}"></span></p>
+            </div>
+            <button type="button" class="btn btn-primary col-4 m-3" data-bs-toggle="modal" data-bs-target="#formModal">
+                Update
+            </button>
+            <button type="button" class="btn btn-danger col-4 m-3" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+            <div th:insert="~{coverage/form :: coverage_form}"></div>
+            <div th:insert="~{coverage/confirm_delete_modal :: delete_modal}"></div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div th:fragment="quote_modal">
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="formModalLabel" th:text="@{${insurance.id != null ? 'Update Insurance' : 'Create Insurance' }}">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="preview_quote">
+              <p>Number Plate: <span id="quote_number_plate"></span></p>
+              <p>Payment: <span id="quote_payment"></span></p>
+              <p>Payment Schedule: <span id="quote_payment_schedule"></span></p>
+              <p>Car: <span id="quote_car_model"></span></p>
+              <p>Coverages</p>
+              <table class="table table-sm table-bordered table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Coverage</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody id="quote_coverages">
+                </tbody>
+              </table>
+              <h5>Payment Plan: <span id="quote_payment_schedule_price"></span></h5>
+              <h5>Total Price: <span id="quote_total_price"></span></h5>
+            </div>
+            <div class="row col-12 justify-content-between m-0">
+              <a href="#" class="btn btn-secondary col-4 btn-primary fw-bold mb-2" data-bs-toggle="modal" data-bs-target="#formModal" data-bs-dismiss="modal">Go Back</a>
+              <input id="submit_form" type="submit" class="btn btn-primary col-4" th:value="${insurance.id != null ? 'Update Insurance' : 'Add Insurance'}"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

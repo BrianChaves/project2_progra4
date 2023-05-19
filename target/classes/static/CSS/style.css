@@ -1,0 +1,14 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Utilizar el espaciado de manera uniforme */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.bg-navbar, .bg-footer{
+    background-color: #f3f3f3;
+}

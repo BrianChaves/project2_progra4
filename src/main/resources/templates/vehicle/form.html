@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Coverage List</title>
+</head>
+<body>
+<div th:fragment="vehicle_form">
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" th:action="@{${vehicle.id != null ? '/vehicle/'+vehicle.id : '/vehicle' }}" th:object="${vehicle}" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formModalLabel" th:text="@{${vehicle.id != null ? 'Update Vehicle' : 'Create Vehicle' }}">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <div>
+                            <label for="brand" class="form-label mb-0 mt-3">Brand</label>
+                            <input id="brand" name="brand" type="text"  class="form-control" autocomplete="off" th:field="*{brand}"/>
+                            <ul th:if="${#fields.hasErrors('brand')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('brand')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label for="model" class="form-label mb-0 mt-3">Model</label>
+                            <input id="model" name="model" type="text"  class="form-control" autocomplete="off" th:field="*{model}"/>
+                            <ul th:if="${#fields.hasErrors('model')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('model')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label for="model" class="form-label mb-0 mt-3">Image</label>
+                            <hr>
+                            <input id="car_image" type="file" name="image" accept="image/*"/>
+                            <ul th:if="${#fields.hasErrors('carImage')}" class="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                <li th:each="err : ${#fields.errors('carImage')}" th:text="${err}" class="error"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" th:value="${vehicle.id != null ? 'Update Vehicle' : 'Create Vehicle'}">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

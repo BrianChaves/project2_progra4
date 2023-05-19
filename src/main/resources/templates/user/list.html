@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>User List</title>
+</head>
+<body>
+    <div layout:fragment="maincontent">
+        <div class="row col-9 justify-content-end mb-0 pb-0 pe-0">
+            <a class="btn btn-primary col-auto rounded-0 rounded-top" data-bs-toggle="modal" data-bs-target="#createUserModal" href="#">Add User</a>
+        </div>
+        <div class="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
+            <div class="card-title ps-2 mt-3">
+                <h4>All Users</h4>
+            </div>
+            <div class="card-body px-4">
+                <table class="table table-striped table-hover">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Roles</th>
+                        <th scope="col"></th>
+                    </tr>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">None</td>
+                        <th scope="row"><a class="link-secondary"  th:text="${user.username}" th:href="@{/user/{username}(username = ${user.username})}">None</a></th>
+                        <td th:text="${user.name}">None</td>
+                        <td th:each="role, role_loop : ${user.roles}">
+                            <div th:text="${role.name} + ${!role_loop.last ? ' | ':''}">None</div>
+                        </td>
+                        <th scope="row"><a class="link-secondary" th:href="@{/user/{username}(username = ${user.username})}">View Details</a></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div th:insert="~{user/create_form :: user_form}"></div>
+    </div>
+</body>
+</html>

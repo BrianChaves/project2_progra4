@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{generic/main}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment List</title>
+</head>
+<body>
+<div layout:fragment="maincontent">
+    <div class="row col-9 justify-content-end mb-0 pb-0 pe-0">
+        <a class="btn btn-primary col-auto rounded-0 rounded-top" data-bs-toggle="modal" data-bs-target="#formModal" href="#">Add Payment</a>
+    </div>
+    <div class="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
+        <div class="card-title ps-2 mt-3">
+            <h4>All Payments</h4>
+        </div>
+        <div class="card-body px-4">
+            <table class="table table-striped table-hover">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Number</th>
+                    <th scope="col">Owner</th>
+                    <th scope="col">Expiration Date</th>
+                    <th scope="col">Billing Address</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="payment : ${payments}">
+                    <td th:text="${payment.id}">None</td>
+                    <th scope="row"><a class="link-secondary" th:text="${payment.getSafeNumber}" th:href="@{/payment/{payment}(payment = ${payment.id})}">None</a></th>
+                    <td th:text="${payment.owner}">None</td>
+                    <td th:text="${payment.expirationDate}">None</td>
+                    <td th:text="${payment.billingAddress}">None</td>
+                    <th scope="row"><a class="link-secondary" th:href="@{/payment/{payment}(payment = ${payment.id})}">View Details</a></th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div th:insert="~{payment/form :: payment_form}"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        layout:decorate="~{generic/main}"
+>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<div layout:fragment="maincontent">
+  <div class="row col-8 mb-0 pb-0 ps-0">
+
+    <a class="btn btn-secondary col-auto rounded-0 rounded-top" th:href="@{/vehicle}">All vehicle</a>
+  </div>
+
+
+  <div class="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+    <div class="card-title mt-2">
+      <h4 class="text-center">Vehicle Details</h4>
+      <input id="car_id" type="hidden" th:value="${vehicle.id}" />
+      <img th:if="${vehicle.carImage != null}" th:src="@{'/vehicle/image/' + ${vehicle.id}}" alt="" style="width: 100px;" />
+
+    </div>
+    <div class="card-body row col-12 justify-content-center">
+      <div class="col-10" th:object="${vehicle}">
+        <p>ID: <span th:text="${vehicle.id}"> None</span></p>
+        <p>Brand: <span th:text="${vehicle.brand}">None</span></p>
+        <p>Model: <span th:text="${vehicle.model}">None</span></p>
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary col-4 m-3" data-bs-toggle="modal" data-bs-target="#formModal">
+          Update
+        </button>
+        <button type="button" class="btn btn-danger col-4 m-3" data-bs-toggle="modal" data-bs-target="#confirm-delete-modal">
+          Delete
+        </button>
+        <div th:insert="~{vehicle/form :: vehicle_form}"></div>
+        <div th:insert="~{vehicle/confirm_delete_modal :: delete_modal}"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div layout:fragment="extra_scripts">
+  <script type="application/javascript" th:src="@{/js/fetch_car_image.js}"></script>
+</div>
+</body>
+</html>
