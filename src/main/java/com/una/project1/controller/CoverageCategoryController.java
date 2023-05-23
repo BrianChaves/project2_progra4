@@ -1,8 +1,6 @@
 package com.una.project1.controller;
 
-import com.una.project1.model.CoverageCategory;
-import com.una.project1.model.Payment;
-import com.una.project1.model.User;
+import com.una.project1.model.*;
 import com.una.project1.service.CoverageCategoryService;
 import com.una.project1.service.UserService;
 import jakarta.transaction.Transactional;
@@ -13,15 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/coverage/category")
 public class CoverageCategoryController {
     @Autowired
@@ -29,91 +24,59 @@ public class CoverageCategoryController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("")
-    public String coverageCategoryList(
-            Model model,
-            Authentication authentication
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        List<CoverageCategory> coverageCategories = coverageCategoryService.findAll();
-        if (!user.isPresent()){
-            return "404";
-        }
-        model.addAttribute("user", user.get());
-        model.addAttribute("coverageCategory", new CoverageCategory());
-        model.addAttribute("coverageCategories", coverageCategories);
-        return "coverageCategory/list";
-    }
-    @PreAuthorize("hasAuthority('AdministratorClient')")
+ @GetMapping("")
+ public List<CoverageCategory> getCoverageCategoryList(Authentication authentication) {
+     Optional<User> user = userService.findByUsername(authentication.getName());
+     if (!user.isPresent()) {
+         throw new RuntimeException("User not found");
+     }
+     return coverageCategoryService.findAll();
+ }
+
+
+
     @PostMapping("")
-    public String coverageCategoryCreate(
-            Model model,
+    public CoverageCategory createCoverageCategory(
             Authentication authentication,
-            @Valid CoverageCategory coverageCategory,
-            BindingResult result
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        List<CoverageCategory> coverageCategories = coverageCategoryService.findAll();
-        if (result.hasErrors()){
-            model.addAttribute("coverageCategory", coverageCategory);
-            model.addAttribute("coverageCategories", coverageCategories);
-            return "coverageCategory/list";
+            @Valid @RequestBody CoverageCategory coverageCategory
+
+    ) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
         }
-        coverageCategoryService.save(coverageCategory);
-        return "redirect:/coverage/category?create=true";
+        return coverageCategoryService.save(coverageCategory);
     }
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("/{coverageCategory}")
-    public String coverageCategoryDetail(
-            Model model,
-            Authentication authentication,
-            @PathVariable("coverageCategory") Long coverageCategoryId
-    ){
-        Optional<CoverageCategory> optionaloptionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-        if (!optionaloptionalCoverageCategory.isPresent()){
-            return "404";
-        }
-        CoverageCategory coverageCategory = optionaloptionalCoverageCategory.get();
-        model.addAttribute("coverageCategory",coverageCategory);
-        return "coverageCategory/detail";
+
+
+@GetMapping("/{coverageCategoryId}")
+public CoverageCategory coverageCategoryDetail(@PathVariable Long coverageCategoryId) {
+    Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+    return optionalCoverageCategory.orElseThrow(() -> new RuntimeException("CoverageCategory not found"));
+}
+
+
+@PutMapping("/{coverageCategoryId}")
+public CoverageCategory updateCoverageCategory(
+        @PathVariable Long coverageCategoryId,
+        @Valid @RequestBody CoverageCategory coverageCategory
+) {
+    Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+    if (!existingCoverageCategory.isPresent()) {
+        throw new RuntimeException("CoverageCategory not found");
+    }
+    return coverageCategoryService.save(coverageCategory);
+}
+
+@DeleteMapping("/{coverageCategoryId}")
+public void deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
+    Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+    if (!optionalCoverageCategory.isPresent()) {
+        throw new RuntimeException("Coverage category not found");
     }
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PostMapping("/{coverageCategory}")
-    public String coverageCategoryModify(
-            Model model,
-            Authentication authentication,
-            @Valid CoverageCategory coverageCategory,
-            BindingResult result,
-            @PathVariable("coverageCategory") Long coverageCategoryId
-    ){
-        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-        if (!existingCoverageCategory.isPresent()){
-            return "404";
-        }
-        if (result.hasErrors()){
-            model.addAttribute("coverageCategory", coverageCategory);
-            return "coverageCategory/detail";
-        }
-        coverageCategoryService.save(coverageCategory);
-        return "redirect:/coverage/category?update=true";
-    }
+    coverageCategoryService.deleteById(coverageCategoryId);
+}
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PostMapping("/{coverageCategory}/delete")
-    public String coverageCategoryDelete(
-            Model model,
-            @PathVariable("coverageCategory") Long coverageCategoryId,
-            Authentication authentication
-    ){
-        Optional<CoverageCategory> optionalcoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-        if (!optionalcoverageCategory.isPresent()){
-            return "404";
-        }
-        CoverageCategory coverageCategory = optionalcoverageCategory.get();
-        coverageCategoryService.deleteById(coverageCategory.getId());
-        return "redirect:/coverage/category?delete=true";
-    }
 }
