@@ -10,9 +10,12 @@ import com.una.project1.service.PaymentService;
 import com.una.project1.service.RoleService;
 import com.una.project1.service.UserService;
 import jakarta.validation.Valid;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 public class MainController {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
@@ -35,8 +38,11 @@ public class MainController {
     RoleService roleService;
     @Autowired
     private PaymentService paymentService;
+
+
+
     @GetMapping("/")
-    public String main(Authentication authentication, Model model){
+    public String main(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         Optional<Role> adminRole = roleService.findByName("AdministratorClient");
         if (!user.isPresent() || !adminRole.isPresent()){
@@ -44,23 +50,21 @@ public class MainController {
         }
         return user.get().getRoles().contains(adminRole.get()) ? "redirect:/user" : "redirect:/insurance";
     }
+
     @GetMapping("/auth/register")
-    public String registerGet(Model model){
-        model.addAttribute("userRegisterHelper", new UserRegisterHelper());
-        return "auth/register";
+    public UserRegisterHelper registerGet() {
+        return new UserRegisterHelper();
     }
+
     @PostMapping("/auth/register")
-    public String registerPost(
-            @Valid UserRegisterHelper userRegisterHelper,
-            BindingResult result,
-            Model model
-    ) {
+    public User registerPost(@Valid @RequestBody UserRegisterHelper userRegisterHelper, BindingResult result
+                             ) {
         User user = new User(
-            userRegisterHelper.getName(),
-            userRegisterHelper.getUsername(),
-            userRegisterHelper.getPasswordHash(),
-            userRegisterHelper.getPhoneNumber(),
-            userRegisterHelper.getEmail()
+                userRegisterHelper.getName(),
+                userRegisterHelper.getUsername(),
+                userRegisterHelper.getPasswordHash(),
+                userRegisterHelper.getPhoneNumber(),
+                userRegisterHelper.getEmail()
         );
         Payment payment = new Payment(
                 userRegisterHelper.getNumber(),
@@ -69,25 +73,26 @@ public class MainController {
                 userRegisterHelper.getSecurityCode(),
                 userRegisterHelper.getBillingAddress()
         );
-        result = userService.validateCreation(user, userRegisterHelper.getPassword2(), result, "create");
-        result = paymentService.validateCreation(payment, result);
-        if (result.hasErrors()){
-            model.addAttribute("userRegisterHelper", userRegisterHelper);
-            return "auth/register";
-        }
+        userService.validateCreation(user, userRegisterHelper.getPassword2(),result, "create");
+        paymentService.validateCreation(payment,result);
+
         user = userService.assignRole(user, "StandardClient");
         user = userService.createUser(user);
         payment = paymentService.assignUser(payment, user);
         payment = paymentService.savePayment(payment);
-        return "redirect:/";
+        return user;
     }
+
     @GetMapping("/auth/login")
-    public String login(){
+    public String login() {
         return "auth/login";
     }
+
     @GetMapping("/auth/logout")
-    public String logout(){
+    public String logout() {
         return "auth/logout";
     }
+
+
 
 }

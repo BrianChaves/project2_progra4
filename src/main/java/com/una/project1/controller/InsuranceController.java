@@ -6,6 +6,8 @@ import com.una.project1.service.*;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("/insurance")
 public class InsuranceController {
     @Autowired
@@ -33,142 +36,85 @@ public class InsuranceController {
     private PaymentService paymentService;
     @Autowired
     private CoverageService coverageService;
-
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
     @GetMapping("")
-    public String insuranceList(
-            Model model,
-            Authentication authentication,
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "search", required = false) String search
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        if (!user.isPresent()){
-            return "404";
+    public List<Insurance> getInsuranceList(Authentication authentication,
+                                            @RequestParam(value = "search", required = false) String search) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
         }
         List<Insurance> insurances = insuranceService.findByUser(user.get());
-        List<Insurance> filteredInsurances = new ArrayList<>();
-        if (search != null && !search.isBlank()){
-            for (Insurance insurance : insurances){
-                if (insurance.getNumberPlate().contains(search)){
-                    filteredInsurances.add(insurance);
-                }
-            }
+        if (search != null && !search.isBlank()) {
+            return insurances.stream()
+                    .filter(insurance -> insurance.getNumberPlate().contains(search))
+                    .collect(Collectors.toList());
         }
-        else{
-            filteredInsurances = insurances;
-        }
-        model.addAttribute("insurance", new Insurance());
-        model.addAttribute("insurances", filteredInsurances);
-        model.addAttribute("payments", user.get().getPayments());
-        model.addAttribute("vehicles", vehicleService.findAll());
-        model.addAttribute("coverages", coverageService.findAll());
-        model.addAttribute("paymentSchedules", paymentScheduleService.findAll());
-        return "insurance/list";
+        return insurances;
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
     @PostMapping("")
-    public String insuranceCreate(
-            Model model,
-            @Valid Insurance insurance,
-            BindingResult result,
-            Authentication authentication,
-            @RequestParam(value = "error", required = false) String error
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        if (!user.isPresent()){
-            return "404";
+    public Insurance createInsurance(@Valid @RequestBody Insurance insurance,
+                                     BindingResult result,
+                                     Authentication authentication) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
         }
-        List<Insurance> insurances = insuranceService.findByUser(user.get());
-        result = insuranceService.validateCreation(insurance, result, "create");
-        if (result.hasErrors()){
-            model.addAttribute("paymentSchedules", paymentScheduleService.findAll());
-            model.addAttribute("vehicles", vehicleService.findAll());
-            model.addAttribute("payments", user.get().getPayments());
-            model.addAttribute("coverages", coverageService.findAll());
-            model.addAttribute("insurances", insurances);
-            model.addAttribute("insurance", insurance);
-            model.addAttribute("error", "true");
-            return "insurance/list";
+        insuranceService.validateCreation(insurance, result, "create");
+        if (result.hasErrors()) {
+            throw new ValidationException(result.toString());
         }
         insuranceService.starDate(insurance);
         insuranceService.assignUser(insurance, user.get());
-        insuranceService.createInsurance(insurance);
-        return "redirect:/insurance";
+         insuranceService.createInsurance(insurance);
+return insurance;//
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
+
     @GetMapping("/{numberPlate}")
-    public String insuranceByNumberplateDetail(
-            Model model,
-            @PathVariable("numberPlate") String numberPlate,
-            Authentication authentication
-    ){
+    public Insurance getInsuranceByNumberPlate(@PathVariable("numberPlate") String numberPlate,
+                                               Authentication authentication) {
         Optional<Insurance> optionalInsurance = insuranceService.findByNumberPlate(numberPlate);
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        if (!optionalInsurance.isPresent() || !user.isPresent()){
-            return "404";
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!optionalInsurance.isPresent() || !user.isPresent()) {
+            throw new RuntimeException("Insurance or User not found");
         }
         Insurance insurance = optionalInsurance.get();
-        if (!(authentication.getName().equals(insurance.getClient().getUsername()))){
-            return "403";
+        if (!authentication.getName().equals(insurance.getClient().getUsername())) {
+            throw new RuntimeException("Access denied");
         }
-        model.addAttribute("paymentSchedules", paymentScheduleService.findAll());
-        model.addAttribute("vehicles", vehicleService.findAll());
-        model.addAttribute("payments", user.get().getPayments());
-        model.addAttribute("coverages", coverageService.findAll());
-        model.addAttribute("insurance",optionalInsurance.get());
-        return "insurance/detail";
+        return insurance;
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
-    @PostMapping("/{numberPlate}")
-    public String insuranceModify(
-            Model model,
-            @Valid Insurance insurance,
-            BindingResult result,
-            @PathVariable("numberPlate") String numberPlate,
-            Authentication authentication,
-            @RequestParam(value = "error", required = false) String error
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
+    @PutMapping("/{numberPlate}")
+    public Insurance updateInsurance(@PathVariable("numberPlate") String numberPlate,
+                                     @Valid @RequestBody Insurance updatedInsurance,
+                                     Authentication authentication) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
         Optional<Insurance> existingInsurance = insuranceService.findByNumberPlate(numberPlate);
-        if (!user.isPresent() || !existingInsurance.isPresent()){
-            return "404";
+        if (!user.isPresent() || !existingInsurance.isPresent()) {
+            throw new RuntimeException("Insurance or User not found");
         }
-        if (!(authentication.getName().equals(insurance.getClient().getUsername()))){
-            return "403";
+        Insurance insurance = existingInsurance.get();
+        if (!authentication.getName().equals(insurance.getClient().getUsername())) {
+            throw new RuntimeException("Access denied");
         }
-        if (result.hasErrors()){
-            model.addAttribute("paymentSchedules", paymentScheduleService.findAll());
-            model.addAttribute("vehicles", vehicleService.findAll());
-            model.addAttribute("payments", user.get().getPayments());
-            model.addAttribute("coverages", coverageService.findAll());
-            model.addAttribute("insurance", insurance);
-            model.addAttribute("error", "true");
-            return "insurance/list";
-        }
-        insuranceService.updateInsurance(existingInsurance.get(), insurance);
-        return "redirect:/insurance";
+        insuranceService.updateInsurance(insurance, updatedInsurance);
+        return insurance;
     }
 
-    @PreAuthorize("hasAuthority('StandardClient')")
-    @PostMapping("/{id}/delete")
-    public String deleteInsurance(Model model, @PathVariable("id") Long id, Authentication authentication) {
+
+    @DeleteMapping("/{id}")
+    public void deleteInsurance(@PathVariable("id") Long id, Authentication authentication) {
         Optional<Insurance> optionalInsurance = insuranceService.findById(id);
-        if (!optionalInsurance.isPresent()){
-            return "404";
+        if (!optionalInsurance.isPresent()) {
+            throw new RuntimeException("Insurance not found");
         }
         Insurance insurance = optionalInsurance.get();
-        if (!(authentication.getName().equals(insurance.getClient().getUsername()))){
-            return "403";
+        if (!authentication.getName().equals(insurance.getClient().getUsername())) {
+            throw new RuntimeException("Access denied");
         }
         insuranceService.deleteInsurance(insurance);
-        return "redirect:/insurance";
     }
+
 }

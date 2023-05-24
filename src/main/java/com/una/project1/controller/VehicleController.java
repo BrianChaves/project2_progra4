@@ -2,6 +2,7 @@ package com.una.project1.controller;
 
 import com.una.project1.model.Coverage;
 import com.una.project1.model.Insurance;
+import com.una.project1.model.User;
 import com.una.project1.model.Vehicle;
 import com.una.project1.service.InsuranceService;
 import com.una.project1.service.VehicleService;
@@ -28,45 +29,35 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/vehicle")
 public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
     @Autowired
     private InsuranceService insuranceService;
-    @Transactional
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("")
-    public String vehicleList(
-            Model model
-    ) {
-        List<Vehicle> vehicles = vehicleService.findAll();
-        model.addAttribute("vehicles", vehicles);
-        model.addAttribute("vehicle", new Vehicle());
-        return "vehicle/list";
-    }
-    @Transactional
-    @PreAuthorize("hasAuthority('AdministratorClient')")
+
+@GetMapping("")
+public List<Vehicle> getVehicleList() {
+    return vehicleService.findAll();
+
+}
+
+
     @PostMapping("")
-    public String createVehicle(
-            Model model,
-            @Valid Vehicle vehicle,
+    public Vehicle createVehicle(
+            @Valid @RequestBody Vehicle vehicle,
             BindingResult result,
             @RequestParam("image") MultipartFile file
     ) throws IOException {
-        List<Vehicle> vehicles = vehicleService.findAll();
         result = vehicleService.validateCreation(vehicle, file, result, "create");
-        if (result.hasErrors()){
-            model.addAttribute("vehicles", vehicles);
-            model.addAttribute("vehicle", vehicle);
-            return "vehicle/list";
+        if (result.hasErrors()) {
+            throw new RuntimeException("Invalid vehicle data");
         }
-        vehicleService.createVehicle(vehicle, file);
-        return "redirect:/vehicle";
+        return vehicleService.createVehicle(vehicle, file);
     }
 
-    @GetMapping("/image/{id}")
+@GetMapping("/image/{id}")
     public ResponseEntity<InputStreamResource> showVehicleImage(@PathVariable String id) {
         InputStream is = new ByteArrayInputStream(vehicleService.getImage(Long.valueOf(id)));
         return ResponseEntity.status(HttpStatus.OK)
@@ -74,69 +65,48 @@ public class VehicleController {
                 .body(new InputStreamResource(is));
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("/{vehicle}")
-    public String vehicleDetail(
-            Model model,
-            Authentication authentication,
-            @PathVariable("vehicle") Long vehicleId
-    ){
-        Optional<Vehicle> optionaloptionalVehicle = vehicleService.findById(vehicleId);
-        if (!optionaloptionalVehicle.isPresent()){
-            return "404";
-        }
-        Vehicle vehicle = optionaloptionalVehicle.get();
-        model.addAttribute("vehicles", vehicleService.findAll());
-        model.addAttribute("vehicle",vehicle);
-        return "vehicle/detail";
-    }
+@GetMapping("/{vehicleId}")
+public Vehicle vehicleDetail(@PathVariable Long vehicleId){
+    Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
+    return optionalVehicle.orElseThrow(() -> new RuntimeException("Vehicle not found"));
+}
 
-    @Transactional
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PostMapping("/{vehicle}")
-    public String vehicleModify(
-            Model model,
-            Authentication authentication,
-            @Valid Vehicle vehicle,
+
+
+
+    @PutMapping("/{vehicleId}")
+    public Vehicle updateVehicle(
+            @PathVariable Long vehicleId,
+            @Valid @RequestBody Vehicle vehicle,
             BindingResult result,
-            @PathVariable("vehicle") Long vehicleId,
             @RequestParam("image") MultipartFile file
+
     ) throws IOException {
         Optional<Vehicle> existingVehicle = vehicleService.findById(vehicleId);
-        if (!existingVehicle.isPresent()){
-            return "404";
+        if (!existingVehicle.isPresent()) {
+            throw new RuntimeException("Vehicle not found");
         }
-        if (result.hasErrors()){
-            model.addAttribute("vehicle", vehicle);
-            return "vehicle/detail";
+        if (result.hasErrors()) {
+            throw new RuntimeException("Invalid vehicle data");
         }
-        vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
-        return "redirect:/vehicle?update=true";
+       return   vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PostMapping("/{vehicle}/delete")
-    public String vehicleDelete(
-            Model model,
-            @PathVariable("vehicle") Long coverageId,
-            Authentication authentication
-    ){
-        Optional<Vehicle> optionalvehicle = vehicleService.findById(coverageId);
-        List<Insurance> insurances = insuranceService.findAll();
-        if (!optionalvehicle.isPresent()){
-            return "404";
-        }
-        for (Insurance insurance : insurances){
-            if (insurance.getVehicle().equals(optionalvehicle.get())){
-                return "403";
-            }
-        }
-        Vehicle vehicle = optionalvehicle.get();
-        vehicleService.deleteById(vehicle.getId());
-        return "redirect:/vehicle?delete=true";
+@DeleteMapping("/{vehicleId}")
+public void deleteVehicle(@PathVariable Long vehicleId) {
+    Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
+    if (!optionalVehicle.isPresent()) {
+        throw new RuntimeException("Vehicle not found");
     }
+    Vehicle vehicle = optionalVehicle.get();
+    for (Insurance insurance : insuranceService.findAll()) {
+        if (insurance.getVehicle().equals(vehicle)) {
+            throw new RuntimeException("Vehicle is associated with an insurance");
+        }
+    }
+    vehicleService.deleteById(vehicle.getId());
+}
+
 }
 
 

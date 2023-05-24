@@ -1,27 +1,29 @@
 package com.una.project1.controller;
 
+import com.una.project1.model.Coverage;
+import com.una.project1.model.CoverageCategory;
 import com.una.project1.model.Payment;
 import com.una.project1.model.User;
+import com.una.project1.service.PaymentScheduleService;
 import com.una.project1.service.PaymentService;
 import com.una.project1.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/payment")
 public class PaymentController {
     @Autowired
@@ -29,106 +31,96 @@ public class PaymentController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('StandardClient')")
+
     @GetMapping("")
-    public String paymentList(
-            Model model,
-            Authentication authentication
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        if (!user.isPresent()){
-            return "404";
+    public List<Payment> getPaymentList(Authentication authentication) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
         }
-        model.addAttribute("user", user.get());
-        model.addAttribute("payment", new Payment());
-        model.addAttribute("payments", user.get().getPayments());
-        return "payment/list";
+        return paymentService.findAll();
+
+        //nose si tambien puede retronar         return user.get().getPayments();
     }
-    @PreAuthorize("hasAuthority('StandardClient')")
+
+
     @PostMapping("")
-    public String paymentCreate(
-            Model model,
-            Authentication authentication,
-            @Valid Payment payment,
-            BindingResult result
-    ){
-        Optional<User> user= userService.findByUsername(authentication.getName());
-        if (result.hasErrors()){
-            model.addAttribute("payment", payment);
-            model.addAttribute("payments", user.get().getPayments());
-            return "payment/list";
+    public Payment createPayment(Authentication authentication, @Valid @RequestBody Payment payment) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found");
         }
         paymentService.assignUser(payment, user.get());
-        paymentService.createPayment(payment);
-        return "redirect:payment?create=true";
+        return paymentService.createPayment(payment);
+        /*
+        * eso no lo retorna
+                paymentService.assignUser(payment, user.get());
+ paymentService.createPayment(payment)
+  return payment;
+  investigue un poco y nose si lo pasado esta coorecto
+         * */
+
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
+
     @GetMapping("/{payment}")
-    public String paymentDetail(
-            Model model,
-            Authentication authentication,
+    public Payment paymentDetail(
+            @AuthenticationPrincipal User user,
             @PathVariable("payment") Long paymentId
-    ){
+    ) {
         Optional<Payment> optionalPayment = paymentService.findById(paymentId);
-        if (!optionalPayment.isPresent()){
-            return "404";
+        if (!optionalPayment.isPresent()) {
+            throw new RuntimeException("Payment not found");
         }
+
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
-        if (!authentication.getName().equals(paymentUser.getUsername())){
-            return "403";
+        if (!user.getUsername().equals(paymentUser.getUsername())) {
+            throw new RuntimeException("Access denied");
         }
 
-        model.addAttribute("payment",payment);
-        return "payment/detail";
+        return payment;
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
-    @PostMapping("/{payment}")
-    public String paymentModify(
-            Model model,
-            Authentication authentication,
-            @Valid Payment payment,
-            BindingResult result,
-            @PathVariable("payment") Long paymentId
-    ){
+    //nose si esta correcto el de detail
+
+    @PutMapping("/{paymentId}")
+    public Payment updatePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId, @Valid @RequestBody Payment updatedPayment) {
         Optional<Payment> existingPayment = paymentService.findById(paymentId);
-        if (!existingPayment.isPresent()){
-            return "404";
+        if (!existingPayment.isPresent()) {
+            throw new RuntimeException("Payment not found");
         }
-        if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())){
-            return "403";
+        if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())) {
+            throw new RuntimeException("Access denied");
         }
-        if (result.hasErrors()){
-            model.addAttribute("payment", payment);
-            return "payment/detail";
-        }
-        paymentService.updatePayment(existingPayment.get(), payment);
-        return "redirect:/payment?update=true";
+        return paymentService.updatePayment(existingPayment.get(), updatedPayment);
+        /*
+        * Lo mismo pasa aca
+        * paymentService.updatePayment(existingPayment.get(), updatedPayment);
+        * return payment
+        *
+        * */
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('StandardClient')")
-    @PostMapping("/{payment}/delete")
-    public String paymentDelete(
-            Model model,
-            @PathVariable("payment") Long paymentId,
-            Authentication authentication
-    ){
+    @DeleteMapping("/{paymentId}")
+    public void deletePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId) {
         Optional<Payment> optionalPayment = paymentService.findById(paymentId);
         Optional<User> user = userService.findByUsername(authentication.getName());
-        if (!optionalPayment.isPresent() || !user.isPresent()){
-            return "404";
+        if (!optionalPayment.isPresent() || !user.isPresent()) {
+            throw new RuntimeException("Payment or User not found");
         }
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
-        if (!(authentication.getName().equals(payment.getUser().getUsername())) || !(user.get().getPayments().size() > 1)){
-            return "403";
+        if (!(authentication.getName().equals(payment.getUser().getUsername())) || !(user.get().getPayments().size() > 1)) {
+            throw new RuntimeException("Access denied");
         }
         paymentService.deletePayment(payment);
-        return "redirect:/payment?delete=true";
     }
 }
+
+
+
+
+
+
+
