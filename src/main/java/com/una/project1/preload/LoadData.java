@@ -120,17 +120,17 @@ class LoadData {
             Date date2 = new Date();
             Date date3 = new Date();
             Date date4 = new Date();
-            Date date5 = new Date();
+//            Date date5 = new Date();
             Insurance insurance1 = new Insurance("123456", 2011, 15000000, date2, payment2, yearlyPayment, user2, vehicle1, coverageSet);
             Insurance insurance2 = new Insurance("345678", 2022, 10000000, date3, payment3, quarterlyPayment, user3, vehicle2, coverageSet);
             Insurance insurance3 = new Insurance("789012", 2018, 20000000, date1, payment1, biannualPayment, user1, vehicle3, coverageSet);
             Insurance insurance4 = new Insurance("123123", 2005, 25000000, date4, payment4, biannualPayment, user4, vehicle4, coverageSet);
-            Insurance insurance5 = new Insurance("7t2713", 2023, 33000000, date5, payment5, biannualPayment, user5, vehicle5, coverageSet);
+//            Insurance insurance5 = new Insurance("7t2713", 2023, 33000000, date5, payment5, biannualPayment, user5, vehicle5, coverageSet);
             insuranceRepository.save(insurance1);
             insuranceRepository.save(insurance2);
             insuranceRepository.save(insurance3);
             insuranceRepository.save(insurance4);
-            insuranceRepository.save(insurance5);
+//            insuranceRepository.save(insurance5);
 
 
         };

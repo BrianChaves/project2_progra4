@@ -1,12 +1,16 @@
 package com.una.project1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Entity
+@JsonIgnoreProperties(value={"insurances"})
 @Table(name = "paymentSchedule")
 public class PaymentSchedule {
     @Id
@@ -15,11 +19,9 @@ public class PaymentSchedule {
     @NotBlank(message = "Name cannot be empty.")
     private String name;
 
-    //Me falta el one to many de esta clase
-/*
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "paymentSchedule", cascade = CascadeType.REMOVE)
-    private Set<PaymentSchedule> paymentSchedule = new HashSet<>();
-*/
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "paymentSchedule", cascade = CascadeType.PERSIST)
+    private Set<Insurance> insurances = new HashSet<>();
+
     public PaymentSchedule() {
     }
 
@@ -48,6 +50,13 @@ public class PaymentSchedule {
         this.name = name;
     }
 
+    public Set<Insurance> getInsurances() {
+        return insurances;
+    }
+
+    public void setInsurances(Set<Insurance> insurances) {
+        this.insurances = insurances;
+    }
 
     @Override
     public boolean equals(Object o) {

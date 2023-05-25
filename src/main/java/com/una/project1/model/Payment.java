@@ -1,11 +1,17 @@
 package com.una.project1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
+@JsonIgnoreProperties(value={"user", "insurances"})
 @Table(name = "payment")
 public class Payment {
     @Id
@@ -30,6 +36,9 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "payment", cascade = CascadeType.PERSIST)
+    private Set<Insurance> insurances = new HashSet<>();
 
     public Payment() {
 
@@ -108,6 +117,14 @@ public class Payment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Set<Insurance> getInsurances() {
+        return insurances;
+    }
+
+    public void setInsurances(Set<Insurance> insurances) {
+        this.insurances = insurances;
     }
 
     @Override

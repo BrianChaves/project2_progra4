@@ -50,16 +50,8 @@ public class PaymentController {
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        paymentService.assignUser(payment, user.get());
+        paymentService.assignUser(payment, user.get( ));
         return paymentService.createPayment(payment);
-        /*
-        * eso no lo retorna
-                paymentService.assignUser(payment, user.get());
- paymentService.createPayment(payment)
-  return payment;
-  investigue un poco y nose si lo pasado esta coorecto
-         * */
-
     }
 
 
@@ -94,12 +86,6 @@ public class PaymentController {
             throw new RuntimeException("Access denied");
         }
         return paymentService.updatePayment(existingPayment.get(), updatedPayment);
-        /*
-        * Lo mismo pasa aca
-        * paymentService.updatePayment(existingPayment.get(), updatedPayment);
-        * return payment
-        *
-        * */
     }
 
     @DeleteMapping("/{paymentId}")

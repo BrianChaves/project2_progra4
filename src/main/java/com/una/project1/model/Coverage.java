@@ -1,5 +1,6 @@
 package com.una.project1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@JsonIgnoreProperties(value={"coverageCategory", "insurances"})
 @Table(name = "coverage")
 public class Coverage {
 
@@ -32,8 +34,6 @@ public class Coverage {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "coverages")
     private Set<Insurance> insurances = new HashSet<>();
-
-
 
     public Coverage() {
     }

@@ -1,5 +1,6 @@
 package com.una.project1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@JsonIgnoreProperties(value={"users"})
 @Table(name = "role")
 public class Role implements Serializable {
     @Id

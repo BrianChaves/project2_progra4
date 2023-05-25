@@ -17,11 +17,14 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
@@ -30,6 +33,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
@@ -45,6 +49,8 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
     @Resource
     @Autowired
     UserDetailsImplementation userDetailsImplementation;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -70,6 +76,11 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
           decisionVoters.add(roleVoter);
           */
         return new AffirmativeBased(decisionVoters);
+    }
+
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
     }
     @Bean
     public DataSource dataSource() {
@@ -104,23 +115,47 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
         return authProvider;
     }
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//            .authorizeHttpRequests((requests) -> requests
+//                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+//                .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/register")).permitAll()
+//                .requestMatchers(AntPathRequestMatcher.antMatcher("/CSS/**")).permitAll()
+//                .requestMatchers(AntPathRequestMatcher.antMatcher("/js/**")).permitAll()
+//                .anyRequest().authenticated()
+//            )
+//            .formLogin((form) -> form.permitAll()
+//                    .loginPage("/auth/login")
+//                    .loginProcessingUrl("/auth/login")
+//                    .defaultSuccessUrl("/", true))
+//            .logout((logout) -> logout.permitAll().logoutUrl("/auth/logout"))
+//            .headers(headers -> headers.frameOptions().disable())
+//            .csrf(csrf -> csrf
+//                .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")));;
+//        return http.build();
         http
-            .authorizeHttpRequests((requests) -> requests
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/register")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/CSS/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/js/**")).permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin((form) -> form.permitAll()
-                    .loginPage("/auth/login")
-                    .loginProcessingUrl("/auth/login")
-                    .defaultSuccessUrl("/", true))
-            .logout((logout) -> logout.permitAll().logoutUrl("/auth/logout"))
+//            .authorizeRequests((requests) -> requests
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/register")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/CSS/**")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/js/**")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/test/**")).permitAll()
+//                        .anyRequest().authenticated()
+//            )
             .headers(headers -> headers.frameOptions().disable())
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")));;
+            .cors().and().csrf().disable()
+            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .authorizeRequests().requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
+            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/test/**")).permitAll();
+        http.authenticationProvider(authProvider());
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

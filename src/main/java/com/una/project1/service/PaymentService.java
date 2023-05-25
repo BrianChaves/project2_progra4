@@ -35,17 +35,17 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public void createPayment(Payment payment) {
-        paymentRepository.save(payment);
+    public Payment createPayment(Payment payment) {
+        return paymentRepository.save(payment);
     }
 
-    public void updatePayment(Payment existingPayment, Payment payment) {
+    public Payment updatePayment(Payment existingPayment, Payment payment) {
         existingPayment.setNumber(payment.getNumber());
         existingPayment.setOwner(payment.getOwner());
         existingPayment.setExpirationDate(payment.getExpirationDate());
         existingPayment.setSecurityCode(payment.getSecurityCode());
         existingPayment.setBillingAddress(payment.getBillingAddress());
-        paymentRepository.save(existingPayment);
+        return paymentRepository.save(existingPayment);
     }
 
     public void deletePayment(Payment payment) {

@@ -1,11 +1,13 @@
 package com.una.project1.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.*;
 
 @Entity
+@JsonIgnoreProperties(value={"insurances", "passwordHash"})
 @Table(name = "profile")
 public class User {
     @Id
@@ -28,8 +30,6 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
-
-
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.REMOVE)
     private Set<Payment> payments = new HashSet<>();

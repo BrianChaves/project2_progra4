@@ -1,4 +1,5 @@
 package com.una.project1.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -6,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@JsonIgnoreProperties(value={"insurances", "carImage"})
 @Table(name = "Vehicle")
 public class Vehicle {
     @Id
