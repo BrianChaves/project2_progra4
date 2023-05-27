@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,29 +34,29 @@ public class UserController {
     @Autowired
     private InsuranceService insuranceService;
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("")
     public List<User> userList() {
         return userService.findAll();
     }
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public User userCreate(
-            @Valid @RequestBody User user,
-            BindingResult result,
-
-            @RequestParam("password2") String password2,
-            @RequestParam("role") String role
-    ) {
+    public ResponseEntity<User> userCreate(@Valid @RequestBody User user, BindingResult result,
+                                           @RequestParam("password2") String password2,
+                                           @RequestParam("role") String role) {
         result = userService.validateCreation(user, password2, result, "create");
         if (result.hasErrors()) {
             throw new RuntimeException("User not found");
         }
         userService.assignRole(user, role);
-        return userService.createUser(user);
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.ok(createdUser);
     }
 
 
+    @PreAuthorize("isSelfOrAdmin(#username)")
     @GetMapping("/{username}")
     public User userDetail(@PathVariable("username") String username) {
         Optional<User> user = userService.findByUsername(username);
@@ -63,58 +64,55 @@ public class UserController {
     }
 
 
+    @PreAuthorize("isSelfOrAdmin(#username)")
     @PutMapping("/{username}")
-    public User userModify(
-            @Valid @RequestBody UserUpdateHelper userData,
-            @PathVariable("username") String username
-    ) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody UserUpdateHelper userData,
+                                           @PathVariable("username") String username) {
         Optional<User> existingUser = userService.findByUsername(username);
         if (!existingUser.isPresent()) {
             throw new RuntimeException("User not found");
         }
 
         userService.updateUser(existingUser.get(), userData);
-        return existingUser.get();
+        return ResponseEntity.ok(existingUser.get());
     }
 
-
+    @PreAuthorize("isSelfOrAdmin(#username)")
     @GetMapping("/{username}/change_password")
-    public User userPasswordChange(
-            @PathVariable("username") String username
-    ) {
+    public ResponseEntity<User> userPasswordChange(@PathVariable("username") String username) {
         Optional<User> user = userService.findByUsername(username);
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
 
-        return user.get();
+        return ResponseEntity.ok(user.get());
     }
 
+    @PreAuthorize("isSelfOrAdmin(#username)")
     @PostMapping("/{username}/change_password")
-    public User userPasswordChange(
-            @Valid @RequestBody UserPasswordHelper userPasswordHelper,
-            @PathVariable("username") String username,
-            BindingResult result,
-
-            HttpSession session
-    ) {
+    public ResponseEntity<User> userPasswordChange(@Valid @RequestBody UserPasswordHelper userPasswordHelper,
+                                                   @PathVariable("username") String username,
+                                                   BindingResult result,
+                                                   HttpSession session) {
         Optional<User> existingUser = userService.findByUsername(username);
         if (!existingUser.isPresent()) {
             throw new RuntimeException("User not found");
         }
         result = userService.validatePasswordChange(existingUser.get(), userPasswordHelper, result);
         if (result.hasErrors()) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException("Invalid password change");
         }
         userService.updatePassword(existingUser.get(), userPasswordHelper);
         userService.logout(session);
-        return existingUser.get();
+        return ResponseEntity.ok(existingUser.get());
     }
 
 
+
+    @PreAuthorize("isSelfOrAdmin(#username)")
     @DeleteMapping("/{username}/delete")
-    public void userDelete(@PathVariable("username") String username, HttpSession session,
-                           Authentication authentication) {
+    public ResponseEntity<Void> userDelete(@PathVariable("username") String username, HttpSession session,
+                                           Authentication authentication) {
         Optional<User> user = userService.findByUsername(username);
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
@@ -124,5 +122,7 @@ public class UserController {
         if (username.equals(authentication.getName())) {
             userService.logout(session);
         }
+
+        return ResponseEntity.noContent().build();
     }
 }

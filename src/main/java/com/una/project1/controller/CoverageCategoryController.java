@@ -6,6 +6,7 @@ import com.una.project1.service.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,8 @@ public class CoverageCategoryController {
     @Autowired
     private UserService userService;
 
- @GetMapping("")
+    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @GetMapping("")
  public List<CoverageCategory> getCoverageCategoryList(Authentication authentication) {
      Optional<User> user = userService.findByUsername(authentication.getName());
      if (!user.isPresent()) {
@@ -35,21 +37,23 @@ public class CoverageCategoryController {
 
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public CoverageCategory createCoverageCategory(
+    public ResponseEntity<CoverageCategory> createCoverageCategory(
             Authentication authentication,
             @Valid @RequestBody CoverageCategory coverageCategory
-
     ) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        return coverageCategoryService.save(coverageCategory);
+        CoverageCategory createdCoverageCategory = coverageCategoryService.save(coverageCategory);
+        return ResponseEntity.ok(createdCoverageCategory);
     }
 
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
 @GetMapping("/{coverageCategoryId}")
 public CoverageCategory coverageCategoryDetail(@PathVariable Long coverageCategoryId) {
     Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
@@ -57,26 +61,29 @@ public CoverageCategory coverageCategoryDetail(@PathVariable Long coverageCatego
 }
 
 
-@PutMapping("/{coverageCategoryId}")
-public CoverageCategory updateCoverageCategory(
-        @PathVariable Long coverageCategoryId,
-        @Valid @RequestBody CoverageCategory coverageCategory
-) {
-    Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-    if (!existingCoverageCategory.isPresent()) {
-        throw new RuntimeException("CoverageCategory not found");
-    }
-    return coverageCategoryService.save(coverageCategory);
-}
-
-@DeleteMapping("/{coverageCategoryId}")
-public void deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
-    Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-    if (!optionalCoverageCategory.isPresent()) {
-        throw new RuntimeException("Coverage category not found");
+    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @PutMapping("/{coverageCategoryId}")
+    public ResponseEntity<CoverageCategory> updateCoverageCategory(
+            @PathVariable Long coverageCategoryId,
+            @Valid @RequestBody CoverageCategory coverageCategory
+    ) {
+        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+        if (!existingCoverageCategory.isPresent()) {
+            throw new RuntimeException("CoverageCategory not found");
+        }
+        CoverageCategory updatedCoverageCategory = coverageCategoryService.save(coverageCategory);
+        return ResponseEntity.ok(updatedCoverageCategory);
     }
 
-    coverageCategoryService.deleteById(coverageCategoryId);
-}
+    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @DeleteMapping("/{coverageCategoryId}")
+    public ResponseEntity<Void> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
+        Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+        if (!optionalCoverageCategory.isPresent()) {
+            throw new RuntimeException("Coverage category not found");
+        }
 
+        coverageCategoryService.deleteById(coverageCategoryId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,7 @@ public class InsuranceController {
     private PaymentService paymentService;
     @Autowired
     private CoverageService coverageService;
+    @PreAuthorize("hasAuthority('StandardClient')")
     @GetMapping("")
     public List<Insurance> getInsuranceList(Authentication authentication,
                                             @RequestParam(value = "search", required = false) String search) {
@@ -52,10 +54,11 @@ public class InsuranceController {
         return insurances;
     }
 
+    @PreAuthorize("hasAuthority('StandardClient')")
     @PostMapping("")
-    public Insurance createInsurance(@Valid @RequestBody Insurance insurance,
-                                     BindingResult result,
-                                     Authentication authentication) {
+    public ResponseEntity<Insurance> createInsurance(@Valid @RequestBody Insurance insurance,
+                                                     BindingResult result,
+                                                     Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
@@ -66,11 +69,12 @@ public class InsuranceController {
         }
         insuranceService.starDate(insurance);
         insuranceService.assignUser(insurance, user.get());
-         insuranceService.createInsurance(insurance);
-return insurance;//
+        insuranceService.createInsurance(insurance);
+        return ResponseEntity.ok(insurance);
     }
 
 
+    @PreAuthorize("hasAuthority('StandardClient')")
     @GetMapping("/{numberPlate}")
     public Insurance getInsuranceByNumberPlate(@PathVariable("numberPlate") String numberPlate,
                                                Authentication authentication) {
@@ -86,10 +90,12 @@ return insurance;//
         return insurance;
     }
 
+
+    @PreAuthorize("hasAuthority('StandardClient')")
     @PutMapping("/{numberPlate}")
-    public Insurance updateInsurance(@PathVariable("numberPlate") String numberPlate,
-                                     @Valid @RequestBody Insurance updatedInsurance,
-                                     Authentication authentication) {
+    public ResponseEntity<Insurance> updateInsurance(@PathVariable("numberPlate") String numberPlate,
+                                                     @Valid @RequestBody Insurance updatedInsurance,
+                                                     Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         Optional<Insurance> existingInsurance = insuranceService.findByNumberPlate(numberPlate);
         if (!user.isPresent() || !existingInsurance.isPresent()) {
@@ -100,12 +106,12 @@ return insurance;//
             throw new RuntimeException("Access denied");
         }
         insuranceService.updateInsurance(insurance, updatedInsurance);
-        return insurance;
+        return ResponseEntity.ok(insurance);
     }
 
-
+    @PreAuthorize("hasAuthority('StandardClient')")
     @DeleteMapping("/{id}")
-    public void deleteInsurance(@PathVariable("id") Long id, Authentication authentication) {
+    public ResponseEntity<Void> deleteInsurance(@PathVariable("id") Long id, Authentication authentication) {
         Optional<Insurance> optionalInsurance = insuranceService.findById(id);
         if (!optionalInsurance.isPresent()) {
             throw new RuntimeException("Insurance not found");
@@ -115,6 +121,7 @@ return insurance;//
             throw new RuntimeException("Access denied");
         }
         insuranceService.deleteInsurance(insurance);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -9,6 +9,8 @@ import com.una.project1.service.InsuranceService;
 import com.una.project1.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.validation.BindingResult;
@@ -31,6 +33,7 @@ public class CoverageController {
     private UserService userService;
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("")
     public List<Coverage> getCoverageList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
@@ -41,8 +44,9 @@ public class CoverageController {
     }
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public Coverage createCoverage(
+    public ResponseEntity<Coverage> createCoverage(
             Authentication authentication,
             @Valid @RequestBody Coverage coverage
     ) {
@@ -50,12 +54,13 @@ public class CoverageController {
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        return coverageService.save(coverage);
+        Coverage createdCoverage = coverageService.save(coverage);
+        return ResponseEntity.ok(createdCoverage);
     }
 
 
 
-
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{coverageId}")
     public Coverage coverageDetail(@PathVariable Long coverageId) {
         Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
@@ -63,9 +68,9 @@ public class CoverageController {
     }
 
 
-
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{coverageId}")
-    public Coverage updateCoverage(
+    public ResponseEntity<Coverage> updateCoverage(
             @PathVariable Long coverageId,
             @Valid @RequestBody Coverage coverage
     ) {
@@ -73,11 +78,13 @@ public class CoverageController {
         if (!existingCoverage.isPresent()) {
             throw new RuntimeException("Coverage not found");
         }
-        return coverageService.save(coverage);
+        Coverage updatedCoverage = coverageService.save(coverage);
+        return ResponseEntity.ok(updatedCoverage);
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @DeleteMapping("/{coverageId}")
-    public void deleteCoverage(@PathVariable Long coverageId) {
+    public ResponseEntity<Void> deleteCoverage(@PathVariable Long coverageId) {
         Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
         if (!optionalCoverage.isPresent()) {
             throw new RuntimeException("Coverage not found");
@@ -89,6 +96,7 @@ public class CoverageController {
             }
         }
         coverageService.deleteById(coverage.getId());
+        return ResponseEntity.noContent().build();
     }
 }
 

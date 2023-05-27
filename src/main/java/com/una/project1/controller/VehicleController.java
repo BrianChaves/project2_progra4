@@ -37,17 +37,17 @@ public class VehicleController {
 
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public Vehicle createVehicle(
-            @Valid @RequestBody Vehicle vehicle,
-            BindingResult result,
-            @RequestParam("image") MultipartFile file
-    ) throws IOException {
+    public ResponseEntity<Vehicle> createVehicle(@Valid @RequestBody Vehicle vehicle,
+                                                 BindingResult result,
+                                                 @RequestParam("image") MultipartFile file) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (result.hasErrors()) {
             throw new RuntimeException("Invalid vehicle data");
         }
-        return vehicleService.createVehicle(vehicle, file);
+        Vehicle createdVehicle = vehicleService.createVehicle(vehicle, file);
+        return ResponseEntity.ok(createdVehicle);
     }
 
     @GetMapping("/image/{id}")
@@ -58,12 +58,14 @@ public class VehicleController {
                     .body(new InputStreamResource(is));
         }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{vehicleId}")
     public Vehicle vehicleDetail(@PathVariable Long vehicleId){
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         return optionalVehicle.orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{vehicleId}")
     public ResponseEntity<String> updateVehicle(
             @PathVariable Long vehicleId,
@@ -94,6 +96,7 @@ public class VehicleController {
                .body("{'message': 'Vehicle Successfully Updated'}");
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @DeleteMapping("/{vehicleId}")
     public ResponseEntity<String> deleteVehicle(@PathVariable Long vehicleId) {
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
