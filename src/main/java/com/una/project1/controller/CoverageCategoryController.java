@@ -6,6 +6,8 @@ import com.una.project1.service.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/coverage/category")
+@RequestMapping("/api/coverage/category")
 public class CoverageCategoryController {
     @Autowired
     CoverageCategoryService coverageCategoryService;
@@ -77,13 +79,16 @@ public CoverageCategory coverageCategoryDetail(@PathVariable Long coverageCatego
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @DeleteMapping("/{coverageCategoryId}")
-    public ResponseEntity<Void> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
+    public ResponseEntity<?> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
         Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
         if (!optionalCoverageCategory.isPresent()) {
-            throw new RuntimeException("Coverage category not found");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{'message': 'Coverage category not found'}");
         }
 
         coverageCategoryService.deleteById(coverageCategoryId);
-        return ResponseEntity.noContent().build();
-    }
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{'message': 'Coverage Category Successfully Deleted'}");    }
 }

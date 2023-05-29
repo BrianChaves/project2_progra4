@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/api/payment")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
@@ -98,20 +99,25 @@ public class PaymentController {
 
     @PreAuthorize("hasAuthority('StandardClient')")
     @DeleteMapping("/{paymentId}")
-    public ResponseEntity<Void> deletePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId) {
+    public ResponseEntity<?> deletePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId) {
         Optional<Payment> optionalPayment = paymentService.findById(paymentId);
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!optionalPayment.isPresent() || !user.isPresent()) {
-            throw new RuntimeException("Payment or User not found");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{'message': 'Payment not found'}");
         }
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
         if (!(authentication.getName().equals(payment.getUser().getUsername())) || !(user.get().getPayments().size() > 1)) {
-            throw new RuntimeException("Access denied");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{'message': 'Access denied'}");
         }
         paymentService.deletePayment(payment);
-        return ResponseEntity.noContent().build();
-    }
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{'message': 'Payment Successfully Deleted'}");    }
 
 }
 
