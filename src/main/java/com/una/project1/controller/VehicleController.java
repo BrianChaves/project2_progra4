@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/vehicle")
+@RequestMapping("/api/vehicle")
 public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
@@ -37,17 +37,24 @@ public class VehicleController {
 
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public Vehicle createVehicle(
-            @Valid @RequestBody Vehicle vehicle,
-            BindingResult result,
-            @RequestParam("image") MultipartFile file
-    ) throws IOException {
+    public ResponseEntity<?> createVehicle(@Valid @RequestBody Vehicle vehicle,
+                                                 BindingResult result,
+                                                 @RequestParam("image") MultipartFile file) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (result.hasErrors()) {
-            throw new RuntimeException("Invalid vehicle data");
+            String errorString = "{'errors':[";
+            for (ObjectError error: result.getAllErrors()) {
+                errorString += String.format("{'%s': '%s'},", error.getObjectName(), error.getDefaultMessage());
+            }
+            errorString += "]}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(errorString);
         }
-        return vehicleService.createVehicle(vehicle, file);
+        Vehicle createdVehicle = vehicleService.createVehicle(vehicle, file);
+        return ResponseEntity.ok(createdVehicle);
     }
 
     @GetMapping("/image/{id}")
@@ -58,14 +65,16 @@ public class VehicleController {
                     .body(new InputStreamResource(is));
         }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{vehicleId}")
     public Vehicle vehicleDetail(@PathVariable Long vehicleId){
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         return optionalVehicle.orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{vehicleId}")
-    public ResponseEntity<String> updateVehicle(
+    public ResponseEntity<?> updateVehicle(
             @PathVariable Long vehicleId,
             @Valid @RequestBody Vehicle vehicle,
             BindingResult result,
@@ -94,11 +103,14 @@ public class VehicleController {
                .body("{'message': 'Vehicle Successfully Updated'}");
     }
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
     @DeleteMapping("/{vehicleId}")
-    public ResponseEntity<String> deleteVehicle(@PathVariable Long vehicleId) {
+    public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()) {
-            throw new RuntimeException("Vehicle not found");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{'message': 'Vehicle not found'}");
         }
         Vehicle vehicle = optionalVehicle.get();
         for (Insurance insurance : insuranceService.findAll()) {

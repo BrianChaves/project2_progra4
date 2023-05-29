@@ -9,12 +9,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,8 +40,6 @@ public class InsuranceController {
     private PaymentService paymentService;
     @Autowired
     private CoverageService coverageService;
-
-    @PreAuthorize("hasAuthority('StandardClient')")
     @GetMapping("")
     public ResponseEntity<?> getInsuranceList(Authentication authentication,
                                               @RequestParam(value = "search", required = false) String search) {
@@ -82,7 +83,7 @@ public class InsuranceController {
         }
         insuranceService.validateCreation(insurance, result, "create");
         if (result.hasErrors()) {
-            throw new ValidationException(result.toString());
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
         insuranceService.starDate(insurance);
         insuranceService.assignUser(insurance, user.get());
