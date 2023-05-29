@@ -37,8 +37,6 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client", cascade = CascadeType.REMOVE)
     private Set<Insurance> insurances = new HashSet<>();
 
-
-
     public User() {
 
     }

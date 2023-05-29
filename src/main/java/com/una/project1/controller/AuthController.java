@@ -9,15 +9,16 @@ import java.util.stream.Collectors;
 //import javax.validation.Valid;
 
 import com.una.project1.config.JwtUtils;
-import com.una.project1.config.UserDetailsImplementation;
 import com.una.project1.form.JwtResponse;
 import com.una.project1.form.MessageResponse;
 import com.una.project1.form.UserRegisterHelper;
 import com.una.project1.form.UserSignInHelper;
+import com.una.project1.model.Payment;
 import com.una.project1.model.Role;
 import com.una.project1.model.User;
-import com.una.project1.repository.RoleRepository;
-import com.una.project1.repository.UserRepository;
+import com.una.project1.service.PaymentService;
+import com.una.project1.service.RoleService;
+import com.una.project1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,11 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -37,22 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
-    UserRepository userRepository;
-
+    UserService userService;
     @Autowired
-    RoleRepository roleRepository;
-
+    RoleService roleService;
+    @Autowired
+    PaymentService paymentService;
     @Autowired
     PasswordEncoder encoder;
-
     @Autowired
     JwtUtils jwtUtils;
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser( @RequestBody UserSignInHelper loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -65,29 +59,41 @@ public class AuthController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getUsername(),
-                roles));
+            userDetails.getUsername(),
+            roles));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser( @RequestBody UserRegisterHelper signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (userService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+                    .body(new MessageResponse("{'errors':[ {'username': 'Username already exists'}]}"));
         }
         Set<Role> roles = new HashSet<>();
-        Optional<Role> standardRole = roleRepository.findByName("StandardClient");
-        if (standardRole.isPresent()){
-            roles.add(standardRole.get());
-        }
-        // Create new user's account
-        User user = new User(signUpRequest.getUsername(),
-                signUpRequest.getName(),
-                encoder.encode(signUpRequest.getPasswordHash()),
-                roles);
-
-        userRepository.save(user);
+        User user = new User(
+            signUpRequest.getName(),
+            signUpRequest.getUsername(),
+            signUpRequest.getPasswordHash(),
+            signUpRequest.getPhoneNumber(),
+            signUpRequest.getEmail()
+        );
+        Payment payment = new Payment(
+                signUpRequest.getNumber(),
+                signUpRequest.getOwner(),
+                signUpRequest.getExpirationDate(),
+                signUpRequest.getSecurityCode(),
+                signUpRequest.getBillingAddress()
+        );
+        user = userService.assignRole(user, "StandardClient");
+        userService.createUser(user);
+        payment = paymentService.assignUser(payment, user);
+        paymentService.savePayment(payment);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(new MessageResponse("User successfully logged out!"));
     }
 }

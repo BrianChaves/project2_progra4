@@ -158,6 +158,4 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
         return http.build();
     }
-
-
 }

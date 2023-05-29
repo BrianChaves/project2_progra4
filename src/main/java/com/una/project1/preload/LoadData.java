@@ -57,13 +57,10 @@ class LoadData {
             userRepository.save(user4);
             userRepository.save(user5);
             log.info("Loading Payments...");
-            Payment payment1 = new Payment("1234123456785678","Jose Diaz", "04/24", "123", "Heredia, Costa Rica", user1);
             Payment payment2 = new Payment("9876543219876543","Eliecer Lopez", "10/24", "456", "New York, United States", user2);
             Payment payment3 = new Payment("1237863123786233","Carlos Alvarez", "11/26", "652", "Cartago, Costa Rica", user3);
             Payment payment4 = new Payment("1231231235555434","Jose Alvarez", "13/28", "677", "Managua, Nicaragua ", user4);
             Payment payment5 = new Payment("1231235471355555","Brian Chaves", "27/26", "420", "Limon City, Costa Rica", user5);
-
-            paymentRepository.save(payment1);
             paymentRepository.save(payment2);
             paymentRepository.save(payment3);
             paymentRepository.save(payment4);
@@ -116,21 +113,18 @@ class LoadData {
             coverageRepository.save(coverage9);
             coverageRepository.save(coverage10);
             coverageSet.add(coverage1);
-            Date date1 = new Date();
             Date date2 = new Date();
             Date date3 = new Date();
             Date date4 = new Date();
-//            Date date5 = new Date();
-            Insurance insurance1 = new Insurance("123456", 2011, 15000000, date2, payment2, yearlyPayment, user2, vehicle1, coverageSet);
-            Insurance insurance2 = new Insurance("345678", 2022, 10000000, date3, payment3, quarterlyPayment, user3, vehicle2, coverageSet);
-            Insurance insurance3 = new Insurance("789012", 2018, 20000000, date1, payment1, biannualPayment, user1, vehicle3, coverageSet);
+            Date date5 = new Date();
+            Insurance insurance2 = new Insurance("123456", 2011, 15000000, date2, payment2, yearlyPayment, user2, vehicle1, coverageSet);
+            Insurance insurance3 = new Insurance("345678", 2022, 10000000, date3, payment3, quarterlyPayment, user3, vehicle2, coverageSet);
             Insurance insurance4 = new Insurance("123123", 2005, 25000000, date4, payment4, biannualPayment, user4, vehicle4, coverageSet);
-//            Insurance insurance5 = new Insurance("7t2713", 2023, 33000000, date5, payment5, biannualPayment, user5, vehicle5, coverageSet);
-            insuranceRepository.save(insurance1);
+            Insurance insurance5 = new Insurance("7t2713", 2023, 33000000, date5, payment5, biannualPayment, user5, vehicle5, coverageSet);
             insuranceRepository.save(insurance2);
             insuranceRepository.save(insurance3);
             insuranceRepository.save(insurance4);
-//            insuranceRepository.save(insurance5);
+            insuranceRepository.save(insurance5);
 
 
         };

@@ -1,5 +1,6 @@
 package com.una.project1.service;
 
+import com.una.project1.form.UserCreateHelper;
 import com.una.project1.model.Role;
 import com.una.project1.model.User;
 import com.una.project1.form.UserPasswordHelper;
@@ -35,9 +36,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public BindingResult validateCreation(User user, String password2, BindingResult result, String type){
+    public BindingResult validateCreation(UserCreateHelper user, BindingResult result, String type){
         Optional<User> optionalUser = this.findByUsername(user.getUsername());
-        if (!Objects.equals(user.getPasswordHash(), password2)){
+        if (!Objects.equals(user.getPasswordHash(), user.getPassword2())){
             result.rejectValue("passwordHash", "error.user", "Passwords must match.");
         }
         if (optionalUser.isPresent() && type == "create"){
@@ -93,5 +94,9 @@ public class UserService {
         if (session != null) {
             session.invalidate();
         }
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }
