@@ -41,9 +41,7 @@ public class PaymentController {
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        return paymentService.findAll();
-
-        //nose si tambien puede retronar         return user.get().getPayments();
+        return user.get().getPayments().stream().toList();
     }
 
 

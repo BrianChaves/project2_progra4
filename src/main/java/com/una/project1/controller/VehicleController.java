@@ -30,7 +30,7 @@ public class VehicleController {
     @Autowired
     private InsuranceService insuranceService;
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
     public List<Vehicle> getVehicleList() {
         return vehicleService.findAll();

@@ -45,11 +45,9 @@ public class InsuranceService {
     }
 
     public BindingResult validateCreation(Insurance insurance, BindingResult result, String type) {
-        //This method will search for a vehicle by its brand and model in the
-        // and return an Optional object that may contain the found vehicle or not.
         Optional<Insurance> optionalVehicle = this.findByNumberPlate(insurance.getNumberPlate());
         if (optionalVehicle.isPresent() && type.equals("create")) {
-            result.rejectValue("numberPlate", "error.Insurance", "A insurance with this number plate already exists.");
+            result.rejectValue("numberPlate", "error.Insurance", "An insurance with this number plate already exists.");
         }
         return result;
     }

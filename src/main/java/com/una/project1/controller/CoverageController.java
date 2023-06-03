@@ -35,7 +35,7 @@ public class CoverageController {
     private UserService userService;
 
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
     public List<Coverage> getCoverageList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());

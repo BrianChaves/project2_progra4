@@ -6,11 +6,11 @@
 </head>
 <body>
   <div th:fragment="quote_modal">
-    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal fade" id="previewQuoteModal" tabindex="-1" aria-labelledby="previewQuoteModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="formModalLabel" th:text="@{${insurance.id != null ? 'Update Insurance' : 'Create Insurance' }}">Modal title</h5>
+            <h5 class="modal-title" id="previewQuoteModalLabel" th:text="@{${insurance.id != null ? 'Update Insurance' : 'Create Insurance' }}">Modal title</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">

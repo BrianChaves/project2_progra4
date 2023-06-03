@@ -7,6 +7,7 @@ import Home from './components/main/Home';
 import AuthService from './services/auth-service';
 import { useEffect, useState } from 'react';
 import UserDetailUpdateRemove from './components/user/UserDetailUpdateRemove';
+import InsuranceDetailUpdateRemove from './components/insurance/InsuranceDetailUpdateRemove';
 function App() {
   const navigate = useNavigate();
   const user = AuthService.getCurrentUser();
@@ -52,6 +53,7 @@ function App() {
             <Route path="/login" element={<Login setCurrentUser={setCurrentUser} setShowAdminContent={setShowAdminContent} setShowStandardContent={setShowStandardContent} />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/user/:username" element={<UserDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/insurance/:numberPlate" element={<InsuranceDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             {
               user ? <Route path="*" element={<Navigate to="/home" replace />} /> 
               : <Route path="*" element={<Navigate to="/login" replace />} /> 

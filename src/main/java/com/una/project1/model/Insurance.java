@@ -81,6 +81,15 @@ public class Insurance {
         this.coverages = coverages;
     }
 
+    public Insurance(String numberPlate, int carYear, int valuation, Payment payment, PaymentSchedule paymentSchedule, Vehicle vehicle, Set<Coverage> coverages) {
+        this.numberPlate = numberPlate;
+        this.carYear = carYear;
+        this.valuation = valuation;
+        this.payment = payment;
+        this.paymentSchedule = paymentSchedule;
+        this.vehicle = vehicle;
+        this.coverages = coverages;
+    }
 
     public Long getId() {
         return id;

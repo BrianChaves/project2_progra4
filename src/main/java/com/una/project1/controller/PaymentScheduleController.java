@@ -1,13 +1,12 @@
 package com.una.project1.controller;
 
-import com.una.project1.model.CoverageCategory;
+import com.una.project1.model.PaymentSchedule;
 import com.una.project1.model.Role;
 import com.una.project1.model.User;
-import com.una.project1.service.CoverageCategoryService;
+import com.una.project1.service.PaymentScheduleService;
 import com.una.project1.service.RoleService;
 import com.una.project1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,20 +16,19 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/role")
-public class RoleController {
+@RequestMapping("/api/paymentSchedule")
+public class PaymentScheduleController {
     @Autowired
-    RoleService roleService;
+    PaymentScheduleService paymentScheduleService;
     @Autowired
     private UserService userService;
-    @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
-    public List<Role> getRoleList(Authentication authentication) {
+    public List<PaymentSchedule> getRoleList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        return roleService.findAll();
+        return paymentScheduleService.findAll();
     }
 
 }

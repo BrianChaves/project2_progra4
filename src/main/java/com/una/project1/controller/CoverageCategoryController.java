@@ -27,7 +27,7 @@ public class CoverageCategoryController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
  public List<CoverageCategory> getCoverageCategoryList(Authentication authentication) {
      Optional<User> user = userService.findByUsername(authentication.getName());

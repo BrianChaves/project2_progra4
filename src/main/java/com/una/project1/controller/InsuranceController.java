@@ -1,7 +1,7 @@
 package com.una.project1.controller;
 
-import com.una.project1.model.Insurance;
-import com.una.project1.model.User;
+import com.una.project1.form.InsuranceCreateHelper;
+import com.una.project1.model.*;
 import com.una.project1.service.*;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -20,9 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -74,13 +72,41 @@ public class InsuranceController {
     }
     @PreAuthorize("hasAuthority('StandardClient')")
     @PostMapping("")
-    public ResponseEntity<?> createInsurance(@Valid @RequestBody Insurance insurance,
+    public ResponseEntity<?> createInsurance(@RequestBody InsuranceCreateHelper insuranceHelper,
                                      BindingResult result,
                                      Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
         }
+        Optional<Payment> payment = paymentService.findById(Long.valueOf(insuranceHelper.getPayment()));
+        Optional<PaymentSchedule> paymentSchedule = paymentScheduleService.findById((long) insuranceHelper.getPaymentSchedule());
+        Optional<Vehicle> vehicle = vehicleService.findById((long) insuranceHelper.getVehicle());
+        Set<Coverage> coverageSet = new HashSet<>();
+        for (int coverageId : insuranceHelper.getCoverages()){
+            Optional<Coverage> coverage = coverageService.findById((long) coverageId);
+            if (coverage.isPresent()){
+                coverageSet.add(coverage.get());
+            }
+        }
+        if (!payment.isPresent()){
+            result.rejectValue("payment", "error.Payment", "Payment value is not valid.");
+        }
+        if (!paymentSchedule.isPresent()){
+            result.rejectValue("paymentSchedule", "error.PaymentSchedule", "PaymentSchedule value is not valid.");
+        }
+        if (!vehicle.isPresent()){
+            result.rejectValue("vehicle", "error.Vehicle", "Vehicle value is not valid.");
+        }
+        Insurance insurance = new Insurance(
+                insuranceHelper.getNumberPlate(),
+                insuranceHelper.getCarYear(),
+                insuranceHelper.getValuation(),
+                payment.get(),
+                paymentSchedule.get(),
+                vehicle.get(),
+                coverageSet
+        );
         insuranceService.validateCreation(insurance, result, "create");
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());

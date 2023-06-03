@@ -13,6 +13,10 @@ public class PaymentScheduleService {
     @Autowired
     private PaymentScheduleRepository paymentScheduleRepository;
     @Transactional
+    public Optional<PaymentSchedule> findById(Long id){
+        return paymentScheduleRepository.findById(id);
+    }
+    @Transactional
     public Optional<PaymentSchedule> findByName(String name){
         return paymentScheduleRepository.findByName(name);
     }

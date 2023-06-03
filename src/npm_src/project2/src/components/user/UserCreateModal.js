@@ -5,6 +5,7 @@ import RestService from '../../services/rest-service';
 
 function UserCreateModal() {
     const [roleList, setRoleList] = useState([]);
+    const [createErrors, setCreateErrors] = useState([]);
 
     useEffect(() => {
         RestService.getObjectList('/role')
@@ -42,8 +43,12 @@ function UserCreateModal() {
         onSubmit: values => {
             RestService.createObject('user', values)
             .then((data) => {
-                console.log(data);
+                setCreateErrors([]);
                 window.location.reload();
+            })
+            .catch((data) => {
+                const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                setCreateErrors(errors);
             })
         },
     });
@@ -74,6 +79,13 @@ function UserCreateModal() {
                                     <div className="error">{formik.errors.username}</div>
                                 </div>
                                 )}
+                                {createErrors.filter((error) => error.field === "username").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "username").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div>
                                 <label htmlFor="passwordHash" className="form-label mb-0 mt-3">Password</label>
@@ -92,6 +104,13 @@ function UserCreateModal() {
                                     <div className="error">{formik.errors.passwordHash}</div>
                                 </div>
                                 )}
+                                {createErrors.filter((error) => error.field === "passwordHash").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "passwordHash").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div>
                                 <label htmlFor="password2" className="form-label mb-0 mt-3">Password (again)</label>
@@ -108,6 +127,13 @@ function UserCreateModal() {
                                 <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                     <div className="error">{formik.errors.password2}</div>
                                 </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "password2").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "password2").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             <div>
@@ -126,6 +152,13 @@ function UserCreateModal() {
                                     <div className="error">{formik.errors.name}</div>
                                 </div>
                                 )}
+                                {createErrors.filter((error) => error.field === "name").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "name").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div>
                                 <label htmlFor="phoneNumber" className="form-label mb-0 mt-3">Phone Number</label>
@@ -143,6 +176,13 @@ function UserCreateModal() {
                                     <div className="error">{formik.errors.phoneNumber}</div>
                                 </div>
                                 )}
+                                {createErrors.filter((error) => error.field === "phoneNumber").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "phoneNumber").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div>
                                 <label htmlFor="email" className="form-label mb-0 mt-3">Email</label>
@@ -159,6 +199,13 @@ function UserCreateModal() {
                                 <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                     <div className="error">{formik.errors.email}</div>
                                 </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "email").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "email").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             <div>
@@ -181,6 +228,13 @@ function UserCreateModal() {
                                 <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                     <div className="error">{formik.errors.role}</div>
                                 </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "role").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "role").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             <div className="modal-footer">

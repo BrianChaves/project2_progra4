@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 import AuthService from '../../services/auth-service';
 
 function UserChangePasswordModal({userData}) {
+    const [createErrors, setCreateErrors] = useState([]);
 
     const formik = useFormik({
         initialValues: {
@@ -23,12 +24,13 @@ function UserChangePasswordModal({userData}) {
         onSubmit: values => {
             RestService.createObject(`/user/${userData.username}/change_password`, values)
             .then((data) => {
-                console.log(data);
+                setCreateErrors([]);
                 AuthService.logout();
                 window.location.replace('/');
             })
-            .catch((error) => {
-                console.log(error);
+            .catch((data) => {
+                const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                setCreateErrors(errors);
             })
         },
     });
@@ -58,6 +60,13 @@ function UserChangePasswordModal({userData}) {
                                         <div className="error">{formik.errors.oldPassword}</div>
                                     </div>
                                     )}
+                                    {createErrors.filter((error) => error.field === "oldPassword").length > 0 && (
+                                        <ul class="alert alert-danger ps-4">
+                                            {createErrors.filter((error) => error.field === "oldPassword").map((error)=> (
+                                                <li>{error.message}</li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                                     <label htmlFor="password" className="form-label mb-0 mt-3">Password</label>
                                     <input 
@@ -73,6 +82,13 @@ function UserChangePasswordModal({userData}) {
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                         <div className="error">{formik.errors.password}</div>
                                     </div>
+                                    )}
+                                    {createErrors.filter((error) => error.field === "password").length > 0 && (
+                                        <ul class="alert alert-danger ps-4">
+                                            {createErrors.filter((error) => error.field === "password").map((error)=> (
+                                                <li>{error.message}</li>
+                                            ))}
+                                        </ul>
                                     )}
                                 </div>
                                 <div>
@@ -90,6 +106,13 @@ function UserChangePasswordModal({userData}) {
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                         <div className="error">{formik.errors.password2}</div>
                                     </div>
+                                    )}
+                                    {createErrors.filter((error) => error.field === "password2").length > 0 && (
+                                        <ul class="alert alert-danger ps-4">
+                                            {createErrors.filter((error) => error.field === "password2").map((error)=> (
+                                                <li>{error.message}</li>
+                                            ))}
+                                        </ul>
                                     )}
                                 </div>
                         </div>

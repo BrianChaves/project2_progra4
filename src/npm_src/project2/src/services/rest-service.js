@@ -20,7 +20,7 @@ const getObjectList = async (path='') => {
                 window.location.replace('/index.html?page=login&logout=true&expired=true')
             }
         }
-        return error.data;
+        throw error.response.data;
     }
 }
 
@@ -36,7 +36,7 @@ const getObjectDetail = async (path='') => {
                 window.location.replace('/index.html?page=login&logout=true&expired=true')
             }
         }
-        return null;
+        throw error.response.data;
     }
 }
 
@@ -56,7 +56,7 @@ const createObject = async (path='', data={}) => {
                 window.location.replace('/index.html?page=login&logout=true&expired=true')
             }
         }
-        return null;
+        throw error.response.data;
     }
 }
 
@@ -76,7 +76,7 @@ const updateObject = async (path='', data={}) => {
                 window.location.replace('/index.html?page=login&logout=true&expired=true')
             }
         }
-        return null;
+        throw error.response.data;
     }
 }
 
@@ -92,7 +92,7 @@ const deleteObject = async (path='') => {
                 window.location.replace('/index.html?page=login&logout=true&expired=true')
             }
         }
-        return null;
+        throw error.response.data;
     }
 }
 
