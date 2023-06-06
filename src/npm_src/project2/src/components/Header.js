@@ -36,19 +36,25 @@ function Header({currentUser, showAdminContent, showStandardContent}) {
                             { showAdminContent && (
                             <>
                             <span>
-                                <li className="nav-item">
-                                    <a className="nav-link">Categories</a>
-                                </li>
+                             <li className="nav-item">
+                                <Link to={`/coverageCategory`} className="nav-link">
+                                    Categories
+                                </Link>
+                            </li>
                             </span>
                             <span>
                                 <li className="nav-item">
-                                    <a className="nav-link">Coverages</a>
-                                </li>
+                                <Link to={`/coverage`} className="nav-link">
+                                    Coverage
+                                </Link>
+                            </li>
                             </span>
                             <span>
-                                <li className="nav-item">
-                                    <a className="nav-link">Vehicles</a>
-                                </li>
+                            <li className="nav-item">
+                                <Link to={`/vehicle`} className="nav-link">
+                                    Vehicle
+                                </Link>
+                            </li>
                             </span>
                             </>
                             )}

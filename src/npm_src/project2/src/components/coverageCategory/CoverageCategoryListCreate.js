@@ -2,16 +2,16 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import RestService from '../../services/rest-service';
 import { Link } from 'react-router-dom';
-import vehicleCreateModal from './vehicleCreateModal';
+import CoverageCategoryCreateModal from './CoverageCategoryCreateModal';
 
-function VehicleListCreate() {
-    const [vehicleList, setvehicleList] = useState([]);
+function CoverageCategoryListCreate() {
+    const [coverageCategoryList, setCoverageCategoryList] = useState([]);
 
     useEffect(() => {
-        RestService.getObjectList('/vehicle')
+        RestService.getObjectList('/coverage/category')
             .then((data) => {
                 if (data != null){
-                    setvehicleList(data);
+                    setCoverageCategoryList(data);
                 }
             })
     }, [])
@@ -19,41 +19,36 @@ function VehicleListCreate() {
         <>
             <div className="row col-9 justify-content-end mb-0 pb-0 pe-0">
 
-                <a className="btn btn-primary col-auto rounded-0 rounded-top" data-bs-toggle="modal" data-bs-target="#createVehicleModal" href="#">Add Vehicle</a>
+            <a className="btn btn-primary col-auto rounded-0 rounded-top" data-bs-toggle="modal" data-bs-target="#createCoverageCategoryModal" href="#">Add Categories</a>
 
             </div>
             <div className="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
                 <div className="card-title ps-2 mt-3">
-                    <h4>All Vehicle</h4>
+                    <h4>All Categories</h4>
                 </div>
                 <div className="card-body px-4">
                     <table className="table table-striped table-hover">
                         <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Brand</th>
-                            <th scope="col">Model</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
                             <th scope="col"></th>
-                            <th scope="col"></th>
-
                         </tr>
                         </thead>
                         <tbody>
-                        {vehicleList.length !== 0 ? vehicleList.map((vehicle) => (
+                        {coverageCategoryList.length !== 0 ? coverageCategoryList.map((coverageCategory) => (
                             <tr>
-                                <td>{vehicleList.id}</td>
+                                <td>{coverageCategory.id}</td>
                                 <th>
-
+                                    <Link to={`/coverageCategory/${coverageCategory.name}`} className="link-secondary">
+                                        {coverageCategory.name}
+                                    </Link>
                                 </th>
-                                <td>{vehicleList.brand}</td>
-                                <td>{vehicleList.model}</td>
-                                <td>{vehicleList.description}</td>
-                                <td>
-                                    <img src={`/api/vehicle/image/${vehicleList.id}`} alt="" style={{width: '100px', border: '1px solid lightgray'}} />
-                                </td>
+                                <td>{coverageCategory.description}</td>
                                 <td>
                                     <th scope="row">
-                                        <Link to={`/vehicle/${vehicleList.id}`} className="link-secondary">
+                                        <Link to={`/coverageCategory/${coverageCategory.name}`} className="link-secondary">
                                             View Details
                                         </Link>
                                     </th>
@@ -66,9 +61,9 @@ function VehicleListCreate() {
                     </table>
                 </div>
             </div>
-            <VehicleCreateModal />
+               <CoverageCategoryCreateModal />
 
         </>
     )
 }
-export default VehicleListCreate;
+export default CoverageCategoryListCreate;
