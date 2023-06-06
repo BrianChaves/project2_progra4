@@ -3,25 +3,31 @@ import { Field, useFormik } from 'formik';
 import * as Yup from 'yup';
 import RestService from '../../services/rest-service';
 
-function CoverageCategoryCreateModal() {
+function CoverageCreateModal() {
     const [coverageCategoryCreate, setCoverageCategoryList] = useState([]);
     const [createErrors, setCreateErrors] = useState([]);
 
+  //Crear la funcionalidad extra
 
     const formik = useFormik({
         initialValues: {
             name: '',
             description: '',
-
+            minimumPrice: '',
+            valuationPercentagePrice: '',
         },
         validationSchema: Yup.object({
             name: Yup.string()
                 .required('Name is required'),
             description: Yup.string()
-                    .required('Description is required'),
+                .required('description is required'),
+            minimumPrice: Yup.string()
+                .required('minimumPrice is required'),
+            valuationPercentagePrice: Yup.string()
+                .required('valuationPercentagePrice is required'),
         }),
         onSubmit: values => {
-            RestService.createObject('/coverage/category', values)
+            RestService.createObject('/coverage', values)
                 .then((data) => {
                     setCreateErrors([]);
                     window.location.reload();
@@ -33,12 +39,12 @@ function CoverageCategoryCreateModal() {
         },
     });
     return (
-        <div className="modal fade" id="createCoverageCategoryModal" tabindex="-1" aria-labelledby="createCoverageCategoryModalLabel" aria-hidden="true">
+        <div className="modal fade" id="createCoverageModal" tabindex="-1" aria-labelledby="createCoverageModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
                     <form onSubmit={formik.handleSubmit}>
                         <div className="modal-header">
-                            <h5 className="modal-title" id="createCoverageCategoryModalLabel">Create Categories</h5>
+                            <h5 className="modal-title" id="createCoverageModalLabel">Create Coverages</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -91,7 +97,54 @@ function CoverageCategoryCreateModal() {
                                     </ul>
                                 )}
                             </div>
-
+                            <div>
+                                <label htmlFor="minimumPrice" className="form-label mb-0 mt-3">Minimum Price</label>
+                                <input
+                                    id="minimumPrice"
+                                    name="minimumPrice"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.minimumPrice}
+                                />
+                                {formik.touched.minimumPrice && formik.errors.minimumPrice && (
+                                    <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                        <div className="error">{formik.errors.minimumPrice}</div>
+                                    </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "minimumPrice").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "minimumPrice").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            <div>
+                                <label htmlFor="valuationPercentagePrice" className="form-label mb-0 mt-3">Percentage Price</label>
+                                <input
+                                    id="valuationPercentagePrice"
+                                    name="valuationPercentagePrice"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.valuationPercentagePrice}
+                                />
+                                {formik.touched.valuationPercentagePrice && formik.errors.valuationPercentagePrice && (
+                                    <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                        <div className="error">{formik.errors.valuationPercentagePrice}</div>
+                                    </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "valuationPercentagePrice").length > 0 && (
+                                    <ul class="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "valuationPercentagePrice").map((error)=> (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
 
                             <div className="modal-footer">
                                 <input type="submit" className="btn btn-primary" value="Create Coverage Categories" />
@@ -104,4 +157,4 @@ function CoverageCategoryCreateModal() {
     )
 }
 
-export default CoverageCategoryCreateModal
+export default CoverageCreateModal

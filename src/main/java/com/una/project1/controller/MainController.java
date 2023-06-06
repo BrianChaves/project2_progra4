@@ -34,7 +34,7 @@ public class MainController {
 
     @RequestMapping( method = {RequestMethod.OPTIONS, RequestMethod.GET},
             path = {"/home/**", "/profile/**",
-                    "/user/**", "/payment/**", "/vehicle/**", "/category/**",
+                    "/user/**", "/payment/**", "/vehicle/**", "/coverageCategory/**",
                     "/coverage/**", "/insurance/**", "/"} )
     public String forwardRegularPaths() {
         return "forward:/index.html";

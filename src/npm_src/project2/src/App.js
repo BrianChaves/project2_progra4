@@ -9,6 +9,10 @@ import { useEffect, useState } from 'react';
 import UserDetailUpdateRemove from './components/user/UserDetailUpdateRemove';
 import InsuranceDetailUpdateRemove from './components/insurance/InsuranceDetailUpdateRemove';
 import CoverageCategoryListCreate from "./components/coverageCategory/CoverageCategoryListCreate";
+import CoverageCategoryDetailUpdateRemove from './components/coverageCategory/CoverageCategoryDetailUpdateRemove';
+import CoverageListCreate from "./components/coverage/CoverageListCreate";
+import CoverageDetailUpdateRemove from './components/coverage/CoverageDetailUpdateRemove';
+
 function App() {
   const navigate = useNavigate();
   const user = AuthService.getCurrentUser();
@@ -54,6 +58,11 @@ function App() {
             <Route path="/login" element={<Login setCurrentUser={setCurrentUser} setShowAdminContent={setShowAdminContent} setShowStandardContent={setShowStandardContent} />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/user/:username" element={<UserDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/coverageCategory" element={<CoverageCategoryListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/coverageCategory/:name" element={<CoverageCategoryDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/coverage" element={<CoverageListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/coverage/:name" element={<CoverageDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+
             {
               user ? <Route path="*" element={<Navigate to="/home" replace />} /> 
               : <Route path="*" element={<Navigate to="/login" replace />} /> 

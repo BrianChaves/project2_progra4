@@ -27,7 +27,7 @@ public class CoverageCategoryController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("authentication.principal.username != ''")
+ @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
  public List<CoverageCategory> getCoverageCategoryList(Authentication authentication) {
      Optional<User> user = userService.findByUsername(authentication.getName());
@@ -49,19 +49,23 @@ public class CoverageCategoryController {
         if (!user.isPresent()) {
             throw new RuntimeException("User not found");
         }
-        CoverageCategory createdCoverageCategory = coverageCategoryService.save(coverageCategory);
-        return ResponseEntity.ok(createdCoverageCategory);
+
+
+        return ResponseEntity.ok().body(coverageCategoryService.save(coverageCategory));
+
     }
 
 
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-@GetMapping("/{coverageCategoryId}")
-public CoverageCategory coverageCategoryDetail(@PathVariable Long coverageCategoryId) {
-    Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
-    return optionalCoverageCategory.orElseThrow(() -> new RuntimeException("CoverageCategory not found"));
-}
-
+    @GetMapping("/{name}")
+    public ResponseEntity<?> coverageCategoryDetail(@PathVariable("name") String name) {
+        Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findByName(name);
+        if (!optionalCoverageCategory.isPresent()){
+            return ResponseEntity.badRequest().body("{message: \"CoverageCategory does not exist\"}");
+        }
+        return ResponseEntity.ok().body(optionalCoverageCategory.get());
+    }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{coverageCategoryId}")
