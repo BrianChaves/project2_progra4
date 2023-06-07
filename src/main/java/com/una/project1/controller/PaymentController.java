@@ -47,10 +47,10 @@ public class PaymentController {
 
     @PreAuthorize("hasAuthority('StandardClient')")
     @PostMapping("")
-    public ResponseEntity<Payment> createPayment(Authentication authentication, @Valid @RequestBody Payment payment) {
+    public ResponseEntity<?> createPayment(Authentication authentication, @Valid @RequestBody Payment payment) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
         paymentService.assignUser(payment, user.get());
         Payment createdPayment = paymentService.createPayment(payment);
@@ -60,62 +60,57 @@ public class PaymentController {
 
 
     @PreAuthorize("hasAuthority('StandardClient')")
-    @GetMapping("/{payment}")
-    public Payment paymentDetail(
+    @GetMapping("/{number}")
+    public ResponseEntity<?> paymentDetail(
             @AuthenticationPrincipal User user,
-            @PathVariable("payment") Long paymentId
+            @PathVariable("number") String number
     ) {
-        Optional<Payment> optionalPayment = paymentService.findById(paymentId);
+        Optional<Payment> optionalPayment = paymentService.findByNumber(number);
         if (!optionalPayment.isPresent()) {
-            throw new RuntimeException("Payment not found");
+            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
 
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
         if (!user.getUsername().equals(paymentUser.getUsername())) {
-            throw new RuntimeException("Access denied");
+            return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
 
-        return payment;
+        return ResponseEntity.ok().body(optionalPayment.get());
     }
-
     //nose si esta correcto el de detail
 
     @PreAuthorize("hasAuthority('StandardClient')")
     @PutMapping("/{paymentId}")
-    public ResponseEntity<Payment> updatePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId, @Valid @RequestBody Payment updatedPayment) {
+    public ResponseEntity<?> updatePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId, @Valid @RequestBody Payment updatedPayment) {
         Optional<Payment> existingPayment = paymentService.findById(paymentId);
         if (!existingPayment.isPresent()) {
-            throw new RuntimeException("Payment not found");
+            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
         if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())) {
-            throw new RuntimeException("Access denied");
+            return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
-        Payment payment = paymentService.updatePayment(existingPayment.get(), updatedPayment);
-        return ResponseEntity.ok(payment);
+        paymentService.updatePayment(existingPayment.get(), updatedPayment);
+        return ResponseEntity.ok().body(existingPayment.get());
     }
 
     @PreAuthorize("hasAuthority('StandardClient')")
-    @DeleteMapping("/{paymentId}")
+    @DeleteMapping("/{paymentId}/delete")
     public ResponseEntity<?> deletePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId) {
         Optional<Payment> optionalPayment = paymentService.findById(paymentId);
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!optionalPayment.isPresent() || !user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Payment not found'}");
+            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
         if (!(authentication.getName().equals(payment.getUser().getUsername())) || !(user.get().getPayments().size() > 1)) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Access denied'}");
+            return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
         paymentService.deletePayment(payment);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Payment Successfully Deleted'}");    }
+        return ResponseEntity.ok().body("{message: \"Payment successfully deleted\"}");
+
+    }
 
 }
 

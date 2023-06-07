@@ -28,9 +28,11 @@ function Header({currentUser, showAdminContent, showStandardContent}) {
                             </li>
                             { showStandardContent && (
                             <span>
-                                <li className="nav-item">
-                                    <a className="nav-link">Payments</a>
-                                </li>
+                              <li className="nav-item">
+                                <Link to={`/payment`} className="nav-link">
+                                    Payment
+                                </Link>
+                            </li>
                             </span>
                             )}
                             { showAdminContent && (
