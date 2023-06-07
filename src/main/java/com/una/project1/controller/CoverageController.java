@@ -1,6 +1,7 @@
 package com.una.project1.controller;
 
 import com.una.project1.model.Coverage;
+import com.una.project1.model.CoverageCategory;
 import com.una.project1.model.Insurance;
 import com.una.project1.model.User;
 import com.una.project1.service.CoverageCategoryService;
@@ -48,13 +49,13 @@ public class CoverageController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public ResponseEntity<Coverage> createCoverage(
+    public ResponseEntity<?> createCoverage(
             Authentication authentication,
             @Valid @RequestBody Coverage coverage
     ) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
         Coverage createdCoverage = coverageService.save(coverage);
         return ResponseEntity.ok(createdCoverage);
@@ -63,16 +64,18 @@ public class CoverageController {
 
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("/{coverageId}")
-    public Coverage coverageDetail(@PathVariable Long coverageId) {
-        Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
-        return optionalCoverage.orElseThrow(() -> new RuntimeException("Coverage not found"));
+    @GetMapping("/{name}")
+    public ResponseEntity<?> coverageDetail(@PathVariable("name") String name) {
+        Optional<Coverage> optionalCoverage = coverageService.findByName(name);
+        if (!optionalCoverage.isPresent()){
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
+        }
+        return ResponseEntity.ok().body(optionalCoverage.get());
     }
-
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{coverageId}")
-    public ResponseEntity<Coverage> updateCoverage(
+    public ResponseEntity<?> updateCoverage(
             @PathVariable Long coverageId,
             @Valid @RequestBody Coverage coverage
     ) {

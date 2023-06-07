@@ -24,7 +24,7 @@ function CoverageListCreate() {
         </div>
         <div className="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
           <div className="card-title ps-2 mt-3">
-            <h4>All Categories</h4>
+            <h4>All Coverages</h4>
           </div>
           <div className="card-body px-4">
             <table className="table table-striped table-hover">

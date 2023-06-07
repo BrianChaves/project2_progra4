@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom';
 import RestService from '../../services/rest-service';
+import CoverageCategoryUpdateModal from "../coverageCategory/CoverageCategoryUpdateModal";
+import CoverageCategoryDeleteModal from "../coverageCategory/CoverageCategoryDeleteModal";
 
 
 function CoverageCategoryDetailUpdateRemove({currentUser}) {
@@ -48,6 +50,8 @@ function CoverageCategoryDetailUpdateRemove({currentUser}) {
                                         Delete
                                     </button>
                                 </div>
+                                <CoverageCategoryUpdateModal currentUser={currentUser} coverageCategoryData={coverageCategoryData} />
+                                <CoverageCategoryDeleteModal currentUser={currentUser} coverageCategoryData={coverageCategoryData} />
                                </>
                         ): (
                             <p>Loading...</p>

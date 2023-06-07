@@ -68,17 +68,18 @@ public class CoverageCategoryController {
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PutMapping("/{coverageCategoryId}")
-    public ResponseEntity<CoverageCategory> updateCoverageCategory(
-            @PathVariable Long coverageCategoryId,
+    @PutMapping("/{name}")
+    public ResponseEntity<?> updateCoverageCategory(
+            @PathVariable String name,
             @Valid @RequestBody CoverageCategory coverageCategory
     ) {
-        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findByName(name);
         if (!existingCoverageCategory.isPresent()) {
-            throw new RuntimeException("CoverageCategory not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
-        CoverageCategory updatedCoverageCategory = coverageCategoryService.save(coverageCategory);
-        return ResponseEntity.ok(updatedCoverageCategory);
+
+        return ResponseEntity.ok().body(coverageCategoryService.save(coverageCategory));
+
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")

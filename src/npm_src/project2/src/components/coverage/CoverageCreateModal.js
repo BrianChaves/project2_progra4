@@ -4,10 +4,17 @@ import * as Yup from 'yup';
 import RestService from '../../services/rest-service';
 
 function CoverageCreateModal() {
-    const [coverageCategoryCreate, setCoverageCategoryList] = useState([]);
+    const [coverageCategoryList, setCoverageCategoryList] = useState([]);
     const [createErrors, setCreateErrors] = useState([]);
 
-  //Crear la funcionalidad extra
+    useEffect(() => {
+        RestService.getObjectList('/coverage/category')
+            .then((data) => {
+                if (data != null){
+                    setCoverageCategoryList(data);
+                }
+            })
+    }, [])
 
     const formik = useFormik({
         initialValues: {
@@ -15,6 +22,8 @@ function CoverageCreateModal() {
             description: '',
             minimumPrice: '',
             valuationPercentagePrice: '',
+            coverageCategory: '',
+
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -25,6 +34,8 @@ function CoverageCreateModal() {
                 .required('minimumPrice is required'),
             valuationPercentagePrice: Yup.string()
                 .required('valuationPercentagePrice is required'),
+            coverageCategory: Yup.string()
+                .required('Required'),
         }),
         onSubmit: values => {
             RestService.createObject('/coverage', values)
@@ -48,6 +59,8 @@ function CoverageCreateModal() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
+
+
 
                             <div>
                                 <label htmlFor="name" className="form-label mb-0 mt-3">Name</label>
@@ -145,6 +158,39 @@ function CoverageCreateModal() {
                                     </ul>
                                 )}
                             </div>
+
+                            <div>
+                                <label htmlFor="coverageCategory" className="form-label mb-0 mt-3">Coverage Category: </label>
+                                {coverageCategoryList.length !== 0 ? (
+                                    <select
+                                        id="coverageCategory"
+                                        name="coverageCategory"
+                                        className="form-select form-select-sm"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.coverageCategory}
+                                    >
+                                        {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory.name}>{coverageCategory.name}</option>)}
+                                    </select>
+                                ) : (
+                                    <p>No Coverage Category exist.</p>
+                                )}
+                                {formik.touched.coverageCategory && formik.errors.coverageCategory && (
+                                    <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
+                                        <div className="error">{formik.errors.coverageCategory}</div>
+                                    </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "coverageCategory").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "coverageCategory").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
+
+
 
                             <div className="modal-footer">
                                 <input type="submit" className="btn btn-primary" value="Create Coverage Categories" />
