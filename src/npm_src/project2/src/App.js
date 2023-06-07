@@ -12,6 +12,8 @@ import CoverageCategoryListCreate from "./components/coverageCategory/CoverageCa
 import CoverageCategoryDetailUpdateRemove from './components/coverageCategory/CoverageCategoryDetailUpdateRemove';
 import CoverageListCreate from "./components/coverage/CoverageListCreate";
 import CoverageDetailUpdateRemove from './components/coverage/CoverageDetailUpdateRemove';
+import VehicleListCreate from './components/vehicle/VehicleListCreate';
+import VehicleDetailUpdateRemove from './components/vehicle/VehicleDetailUpdateRemove';
 
 function App() {
   const navigate = useNavigate();
@@ -58,10 +60,13 @@ function App() {
             <Route path="/login" element={<Login setCurrentUser={setCurrentUser} setShowAdminContent={setShowAdminContent} setShowStandardContent={setShowStandardContent} />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/user/:username" element={<UserDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/insurance/:numberPlate" element={<InsuranceDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverageCategory" element={<CoverageCategoryListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverageCategory/:name" element={<CoverageCategoryDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverage" element={<CoverageListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverage/:name" element={<CoverageDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/vehicle" element={<VehicleListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/vehicle/:id" element={<VehicleDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
 
             {
               user ? <Route path="*" element={<Navigate to="/home" replace />} /> 

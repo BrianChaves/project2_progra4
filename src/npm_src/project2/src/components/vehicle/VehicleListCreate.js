@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import RestService from '../../services/rest-service';
 import { Link } from 'react-router-dom';
 import vehicleCreateModal from './vehicleCreateModal';
+import VehicleCreateModal from './vehicleCreateModal';
 
 function VehicleListCreate() {
     const [vehicleList, setvehicleList] = useState([]);
@@ -24,7 +25,7 @@ function VehicleListCreate() {
             </div>
             <div className="card row col-9 justify-content-center bg-light rounded-0 rounded-bottom rounded-start shadow-sm mt-0">
                 <div className="card-title ps-2 mt-3">
-                    <h4>All Vehicle</h4>
+                    <h4>All Vehicles</h4>
                 </div>
                 <div className="card-body px-4">
                     <table className="table table-striped table-hover">
@@ -33,7 +34,7 @@ function VehicleListCreate() {
                             <th scope="col">ID</th>
                             <th scope="col">Brand</th>
                             <th scope="col">Model</th>
-                            <th scope="col"></th>
+                            <th scope="col">Image</th>
                             <th scope="col"></th>
 
                         </tr>
@@ -41,32 +42,33 @@ function VehicleListCreate() {
                         <tbody>
                         {vehicleList.length !== 0 ? vehicleList.map((vehicle) => (
                             <tr>
-                                <td>{vehicleList.id}</td>
+                                <td>{vehicle.id}</td>
                                 <th>
-
+                                    <Link to={`/vehicle/${vehicle.id}`} className="link-secondary">
+                                        {vehicle.brand}
+                                    </Link>
                                 </th>
-                                <td>{vehicleList.brand}</td>
-                                <td>{vehicleList.model}</td>
-                                <td>{vehicleList.description}</td>
+                                <td>{vehicle.model}</td>
+                                <td>{vehicle.description}</td>
                                 <td>
-                                    <img src={`/api/vehicle/image/${vehicleList.id}`} alt="" style={{width: '100px', border: '1px solid lightgray'}} />
+                                    <img src={`/api/vehicle/image/${vehicle.id}`} alt="" style={{width: '100px', border: '1px solid lightgray'}} />
                                 </td>
                                 <td>
                                     <th scope="row">
-                                        <Link to={`/vehicle/${vehicleList.id}`} className="link-secondary">
+                                        <Link to={`/vehicle/${vehicle.id}`} className="link-secondary">
                                             View Details
                                         </Link>
                                     </th>
                                 </td>
                             </tr>
                         )): (
-                            <tr>No categories exist</tr>
+                            <tr>No vehicles exist</tr>
                         )}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <VehicleCreateModal />
+            <VehicleCreateModal vehicleList={vehicleList} />
 
         </>
     )

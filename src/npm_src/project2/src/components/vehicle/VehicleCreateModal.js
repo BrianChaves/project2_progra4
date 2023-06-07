@@ -3,30 +3,38 @@ import { Field, useFormik } from 'formik';
 import * as Yup from 'yup';
 import RestService from '../../services/rest-service';
 
-function VehicleCreateModal() {
+function VehicleCreateModal({vehicleList}) {
     const [createErrors, setCreateErrors] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(undefined);
+    const formData = new FormData();
 
-    //Crear la funcionalidad extra
+    const handleImageChange = (event) => {
+        console.log(event.target.files[0]);
+        setSelectedImage(event.target.files[0]);
+        formik.handleChange(event);
+    };
 
     const formik = useFormik({
         initialValues: {
             brand: '',
             model: '',
-            minimumPrice: '',
-            valuationPercentagePrice: '',
+            image: null,
         },
         validationSchema: Yup.object({
-            name: Yup.string()
-                .required('Name is required'),
-            description: Yup.string()
-                .required('description is required'),
-            minimumPrice: Yup.string()
-                .required('minimumPrice is required'),
-            valuationPercentagePrice: Yup.string()
-                .required('valuationPercentagePrice is required'),
+            brand: Yup.string()
+                .required('Brand is required'),
+            model: Yup.string()
+                .required('Model is required'),
+            image: Yup.mixed()
+                .required('Image is required'),
         }),
         onSubmit: values => {
-            RestService.createObject('/coverage', values)
+            formData.append("brand", values.brand);
+            formData.append("model", values.model);
+            formData.append("image", selectedImage);
+            console.log(formData)
+            console.log(selectedImage);
+            RestService.createObject('/vehicle', formData)
                 .then((data) => {
                     setCreateErrors([]);
                     window.location.reload();
@@ -38,115 +46,108 @@ function VehicleCreateModal() {
         },
     });
     return (
-        <div className="modal fade" id="createCoverageModal" tabindex="-1" aria-labelledby="createCoverageModalLabel" aria-hidden="true">
+        <div className="modal fade" id="createVehicleModal" tabindex="-1" aria-labelledby="createVehicleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
                     <form onSubmit={formik.handleSubmit}>
                         <div className="modal-header">
-                            <h5 className="modal-title" id="createCoverageModalLabel">Create Coverages</h5>
+                            <h5 className="modal-title" id="createVehicleModalLabel">Create Vehicle</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-
                             <div>
-                                <label htmlFor="name" className="form-label mb-0 mt-3">Name</label>
+                                <label htmlFor="brand" className="form-label mb-0 mt-3">Brand</label>
                                 <input
-                                    id="name"
-                                    name="name"
+                                    list="brandDatalistOptions" 
+                                    id="brandDataList" 
+                                    name='brand'
                                     type="text"
                                     className="form-control"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.name}
+                                    value={formik.values.brand}
                                 />
-                                {formik.touched.name && formik.errors.name && (
+                                <datalist id="brandDatalistOptions">
+                                    {vehicleList.length > 0 && (
+                                        vehicleList.filter((item, index) => vehicleList.indexOf(item) === index).map((vehicle) => {
+                                            return <option value={vehicle.brand}></option>})
+                                    )}
+                                </datalist>
+                                {formik.touched.brand && formik.errors.brand && (
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
-                                        <div className="error">{formik.errors.name}</div>
+                                        <div className="error">{formik.errors.brand}</div>
                                     </div>
                                 )}
-                                {createErrors.filter((error) => error.field === "name").length > 0 && (
+                                {createErrors.filter((error) => error.field === "brand").length > 0 && (
                                     <ul class="alert alert-danger ps-4">
-                                        {createErrors.filter((error) => error.field === "name").map((error)=> (
+                                        {createErrors.filter((error) => error.field === "brand").map((error)=> (
                                             <li>{error.message}</li>
                                         ))}
                                     </ul>
                                 )}
                             </div>
                             <div>
-                                <label htmlFor="description" className="form-label mb-0 mt-3">Description</label>
+                                <label htmlFor="model" className="form-label mb-0 mt-3">Model</label>
                                 <input
-                                    id="description"
-                                    name="description"
+                                    id="model"
+                                    name="model"
                                     type="text"
                                     className="form-control"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.description}
+                                    value={formik.values.model}
                                 />
-                                {formik.touched.description && formik.errors.description && (
+                                {formik.touched.model && formik.errors.model && (
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
-                                        <div className="error">{formik.errors.description}</div>
+                                        <div className="error">{formik.errors.model}</div>
                                     </div>
                                 )}
-                                {createErrors.filter((error) => error.field === "description").length > 0 && (
+                                {createErrors.filter((error) => error.field === "model").length > 0 && (
                                     <ul class="alert alert-danger ps-4">
-                                        {createErrors.filter((error) => error.field === "description").map((error)=> (
+                                        {createErrors.filter((error) => error.field === "model").map((error)=> (
                                             <li>{error.message}</li>
                                         ))}
                                     </ul>
                                 )}
                             </div>
                             <div>
-                                <label htmlFor="minimumPrice" className="form-label mb-0 mt-3">Minimum Price</label>
+                                <label htmlFor="image" className="form-label mb-0 mt-3">Image</label>
                                 <input
-                                    id="minimumPrice"
-                                    name="minimumPrice"
-                                    type="text"
+                                    id="image"
+                                    name="image"
+                                    type="file"
+                                    accept="image/*"
                                     className="form-control"
-                                    onChange={formik.handleChange}
+                                    onChange={handleImageChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.minimumPrice}
+                                    value={formik.values.image}
                                 />
-                                {formik.touched.minimumPrice && formik.errors.minimumPrice && (
+                                {formik.touched.image && formik.errors.image && (
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
-                                        <div className="error">{formik.errors.minimumPrice}</div>
+                                        <div className="error">{formik.errors.image}</div>
                                     </div>
                                 )}
-                                {createErrors.filter((error) => error.field === "minimumPrice").length > 0 && (
+                                {createErrors.filter((error) => error.field === "image").length > 0 && (
                                     <ul class="alert alert-danger ps-4">
-                                        {createErrors.filter((error) => error.field === "minimumPrice").map((error)=> (
+                                        {createErrors.filter((error) => error.field === "image").map((error)=> (
                                             <li>{error.message}</li>
                                         ))}
                                     </ul>
                                 )}
                             </div>
+                            {selectedImage && (
                             <div>
-                                <label htmlFor="valuationPercentagePrice" className="form-label mb-0 mt-3">Percentage Price</label>
-                                <input
-                                    id="valuationPercentagePrice"
-                                    name="valuationPercentagePrice"
-                                    type="text"
-                                    className="form-control"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.valuationPercentagePrice}
+                                <img
+                                    alt="Not Found"
+                                    width={"120px"}
+                                    src={URL.createObjectURL(selectedImage)}
                                 />
-                                {formik.touched.valuationPercentagePrice && formik.errors.valuationPercentagePrice && (
-                                    <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
-                                        <div className="error">{formik.errors.valuationPercentagePrice}</div>
-                                    </div>
-                                )}
-                                {createErrors.filter((error) => error.field === "valuationPercentagePrice").length > 0 && (
-                                    <ul class="alert alert-danger ps-4">
-                                        {createErrors.filter((error) => error.field === "valuationPercentagePrice").map((error)=> (
-                                            <li>{error.message}</li>
-                                        ))}
-                                    </ul>
-                                )}
+                                <br />
+                                <button class="btn btn-secondary btn-sm mb-2" onClick={() => setSelectedImage(undefined)}>Remove</button>
                             </div>
-
+                            )}
                             <div className="modal-footer">
-                                <input type="submit" className="btn btn-primary" value="Create Coverage Categories" />
+                                <input type="submit" className="btn btn-primary" value="Create Vehicle" />
                             </div>
                         </div>
                     </form>
@@ -156,4 +157,4 @@ function VehicleCreateModal() {
     )
 }
 
-export default VehicleCreateModal
+export default VehicleCreateModal;

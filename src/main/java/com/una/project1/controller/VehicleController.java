@@ -30,7 +30,7 @@ public class VehicleController {
     @Autowired
     private InsuranceService insuranceService;
 
-    @PreAuthorize("authentication.principal.username != ''")
+    @PreAuthorize("hasAuthority('AdministratorClient') || hasAuthority('StandardClient')")
     @GetMapping("")
     public List<Vehicle> getVehicleList() {
         return vehicleService.findAll();
@@ -39,7 +39,7 @@ public class VehicleController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public ResponseEntity<?> createVehicle(@Valid @RequestBody Vehicle vehicle,
+    public ResponseEntity<?> createVehicle(@Valid @ModelAttribute Vehicle vehicle,
                                                  BindingResult result,
                                                  @RequestParam("image") MultipartFile file) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");

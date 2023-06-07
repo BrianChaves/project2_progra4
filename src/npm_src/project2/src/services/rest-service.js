@@ -5,7 +5,6 @@ import AuthService from './auth-service';
 
 axios.defaults.baseURL = 'http://127.0.0.1:8080/api/';
 axios.defaults.headers.common['Authorization'] = authHeader();
-axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 const getObjectList = async (path='') => {
     try {
@@ -43,7 +42,7 @@ const getObjectDetail = async (path='') => {
 const createObject = async (path='', data={}) => {
     try {
         const response = await axios.post(path, data, {
-            headers: {
+            [path !== "/vehicle" && 'headers']: {
                 'Content-Type': 'application/json'
             }
         });
