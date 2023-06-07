@@ -74,39 +74,34 @@ public class CoverageController {
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PutMapping("/{coverageId}")
+    @PutMapping("/{name}")
     public ResponseEntity<?> updateCoverage(
-            @PathVariable Long coverageId,
+            @PathVariable String name,
             @Valid @RequestBody Coverage coverage
     ) {
-        Optional<Coverage> existingCoverage = coverageService.findById(coverageId);
+        Optional<Coverage> existingCoverage = coverageService.findByName(name);
         if (!existingCoverage.isPresent()) {
-            throw new RuntimeException("Coverage not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
-        Coverage updatedCoverage = coverageService.save(coverage);
-        return ResponseEntity.ok(updatedCoverage);
+        coverageService.save(coverage);
+        return ResponseEntity.ok().body(existingCoverage.get());
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @DeleteMapping("/{coverageId}")
-    public ResponseEntity<?> deleteCoverage(@PathVariable Long coverageId) {
-        Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<?> deleteCoverage(@PathVariable Long id) {
+        Optional<Coverage> optionalCoverage = coverageService.findById(id);
         if (!optionalCoverage.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Coverage not found'}");        }
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");       }
         Coverage coverage = optionalCoverage.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getCoverages().contains(coverage)) {
-                return ResponseEntity.status(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body("{'message': 'Coverage is associated with an insurance'}");
+                return ResponseEntity.ok().body("{message: \"Coverage is associated with an insurance\"}");
             }
         }
         coverageService.deleteById(coverage.getId());
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Coverage Successfully Deleted'}");    }
+        return ResponseEntity.ok().body("{message: \"Coverage successfully deleted\"}");
+    }
 }
 
 

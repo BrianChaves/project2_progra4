@@ -1,5 +1,6 @@
 package com.una.project1.service;
 
+import com.una.project1.model.Coverage;
 import com.una.project1.model.Payment;
 import com.una.project1.model.User;
 import com.una.project1.repository.PaymentRepository;
@@ -18,6 +19,10 @@ public class PaymentService {
     @Transactional
     public Optional<Payment> findById(Long id){
         return paymentRepository.findById(id);
+    }
+    @Transactional
+    public Optional<Payment> findByNumber(String number) {
+        return paymentRepository.findByNumber(number);
     }
     @Transactional
     public List<Payment> findAll() {
@@ -47,6 +52,7 @@ public class PaymentService {
         existingPayment.setBillingAddress(payment.getBillingAddress());
         return paymentRepository.save(existingPayment);
     }
+
 
     public void deletePayment(Payment payment) {
         paymentRepository.delete(payment);

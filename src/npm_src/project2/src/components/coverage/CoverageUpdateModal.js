@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 
-function CoverageUpdateModal({currentUser, coverageData}) {
+function CoverageUpdateModal({currentUser,coverageData}) {
     const [createErrors, setCreateErrors] = useState([]);
     const [coverageCategoryList, setCoverageCategoryList] = useState([]);
 
@@ -36,11 +36,11 @@ function CoverageUpdateModal({currentUser, coverageData}) {
                 .required('Required'),
         }),
         onSubmit: values => {
-            RestService.updateObject(`/coverage/${coverageData.id}`, values)
+            RestService.updateObject(`/coverage/${coverageData.name}`, values)
                 .then((data) => {
                     console.log(data);
                     setCreateErrors([]);
-                    window.location.replace('/coverage');
+                    window.location.replace('/coverage/');
                 })
                 .catch((data) => {
                     const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
@@ -54,7 +54,7 @@ function CoverageUpdateModal({currentUser, coverageData}) {
                 <div className="modal-content">
                     <form onSubmit={formik.handleSubmit}>
                         <div className="modal-header">
-                            <h5 className="modal-title" id="updateModalLabel">Update User</h5>
+                            <h5 className="modal-title" id="updateModalLabel">Update Coverage</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -194,7 +194,7 @@ function CoverageUpdateModal({currentUser, coverageData}) {
 
 
                         <div className="modal-footer">
-                            <input type="submit" className="btn btn-primary" value="Update User" />
+                            <input type="submit" className="btn btn-primary" value="Update Coverage" />
                         </div>
                     </form>
                 </div>

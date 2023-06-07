@@ -77,23 +77,20 @@ public class CoverageCategoryController {
         if (!existingCoverageCategory.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
-
-        return ResponseEntity.ok().body(coverageCategoryService.save(coverageCategory));
+        coverageCategoryService.save(coverageCategory);
+        return ResponseEntity.ok().body(existingCoverageCategory.get());
 
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @DeleteMapping("/{coverageCategoryId}")
+    @DeleteMapping("/{coverageCategoryId}/delete")
     public ResponseEntity<?> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
         Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
         if (!optionalCoverageCategory.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Coverage category not found'}");
+            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
 
         coverageCategoryService.deleteById(coverageCategoryId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Coverage Category Successfully Deleted'}");    }
+        return ResponseEntity.ok().body("{message: \"Coverage Category successfully deleted\"}");
+    }
 }

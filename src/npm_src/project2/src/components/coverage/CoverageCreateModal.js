@@ -40,8 +40,8 @@ function CoverageCreateModal() {
         onSubmit: values => {
             RestService.createObject('/coverage', values)
                 .then((data) => {
-                    setCreateErrors([]);
                     window.location.reload();
+                    setCreateErrors([]);
                 })
                 .catch((data) => {
                     const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));

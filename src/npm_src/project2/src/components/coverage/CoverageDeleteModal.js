@@ -7,7 +7,7 @@ function CoverageDeleteModal({currentUser, coverageData}) {
         RestService.deleteObject(`coverage/${coverageData.id}/delete`)
             .then((data) => {
                 console.log(data);
-                window.location.replace('coverage/');
+                window.location.replace('/coverage/');
             })
     }
     return (

@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 import RestService from '../../services/rest-service';
 
 function CoverageCategoryCreateModal() {
-    const [coverageCategoryCreate, setCoverageCategoryList] = useState([]);
     const [createErrors, setCreateErrors] = useState([]);
 
 

@@ -23,8 +23,11 @@ function CoverageDetailUpdateRemove({currentUser}) {
   return (
       <>
 
-
         <div className="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
+            <div className="row col-8 mb-0 pb-0 ps-0">
+
+
+            </div>
           <div className="card-title mt-2">
             <h4 className="text-center">Coverage  Details</h4>
           </div>
@@ -36,20 +39,22 @@ function CoverageDetailUpdateRemove({currentUser}) {
                       <p>Description : {coverageData.description}</p>
                       <p>Minimun Price: {coverageData.minimumPrice}</p>
                       <p>Percentage Price: {coverageData.valuationPercentagePrice}</p>
-                      {
-                          coverageData.coverages?.length > 0
+
+
+                       {
+                          coverageData.coverageCategory?.length >= 0
                               ? (
                                   <>
-                                      <p>Acquired Coverages:</p>
+                                      <p>Acquired Categories:</p>
                                       <ul>
-                                          {coverageData.coverages?.map(coverage => (
+                                          {coverageData.coverageCategory?.map(coverageCategory => (
                                               <li>
-                                                  {coverage.name}
+                                                  <li key={coverageCategory.id}>{coverageCategory.name}</li>
                                               </li>))}
                                       </ul>
                                   </>
                               ) : (
-                                  <p>Coverages: None acquired.</p>
+                                  <p>Categories: None acquired.</p>
                               )
                       }
                     <div className="row col-12 justify-content-center">
