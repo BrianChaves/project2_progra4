@@ -1,6 +1,7 @@
 package com.una.project1.controller;
 
 import com.una.project1.model.Coverage;
+import com.una.project1.model.CoverageCategory;
 import com.una.project1.model.Insurance;
 import com.una.project1.model.User;
 import com.una.project1.service.CoverageCategoryService;
@@ -48,13 +49,13 @@ public class CoverageController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public ResponseEntity<Coverage> createCoverage(
+    public ResponseEntity<?> createCoverage(
             Authentication authentication,
             @Valid @RequestBody Coverage coverage
     ) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
         Coverage createdCoverage = coverageService.save(coverage);
         return ResponseEntity.ok(createdCoverage);
@@ -63,47 +64,44 @@ public class CoverageController {
 
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @GetMapping("/{coverageId}")
-    public Coverage coverageDetail(@PathVariable Long coverageId) {
-        Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
-        return optionalCoverage.orElseThrow(() -> new RuntimeException("Coverage not found"));
+    @GetMapping("/{name}")
+    public ResponseEntity<?> coverageDetail(@PathVariable("name") String name) {
+        Optional<Coverage> optionalCoverage = coverageService.findByName(name);
+        if (!optionalCoverage.isPresent()){
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
+        }
+        return ResponseEntity.ok().body(optionalCoverage.get());
     }
 
-
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PutMapping("/{coverageId}")
-    public ResponseEntity<Coverage> updateCoverage(
-            @PathVariable Long coverageId,
+    @PutMapping("/{name}")
+    public ResponseEntity<?> updateCoverage(
+            @PathVariable String name,
             @Valid @RequestBody Coverage coverage
     ) {
-        Optional<Coverage> existingCoverage = coverageService.findById(coverageId);
+        Optional<Coverage> existingCoverage = coverageService.findByName(name);
         if (!existingCoverage.isPresent()) {
-            throw new RuntimeException("Coverage not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
-        Coverage updatedCoverage = coverageService.save(coverage);
-        return ResponseEntity.ok(updatedCoverage);
+        coverageService.save(coverage);
+        return ResponseEntity.ok().body(existingCoverage.get());
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @DeleteMapping("/{coverageId}")
-    public ResponseEntity<?> deleteCoverage(@PathVariable Long coverageId) {
-        Optional<Coverage> optionalCoverage = coverageService.findById(coverageId);
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<?> deleteCoverage(@PathVariable Long id) {
+        Optional<Coverage> optionalCoverage = coverageService.findById(id);
         if (!optionalCoverage.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Coverage not found'}");        }
+            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");       }
         Coverage coverage = optionalCoverage.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getCoverages().contains(coverage)) {
-                return ResponseEntity.status(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body("{'message': 'Coverage is associated with an insurance'}");
+                return ResponseEntity.ok().body("{message: \"Coverage is associated with an insurance\"}");
             }
         }
         coverageService.deleteById(coverage.getId());
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Coverage Successfully Deleted'}");    }
+        return ResponseEntity.ok().body("{message: \"Coverage successfully deleted\"}");
+    }
 }
 
 

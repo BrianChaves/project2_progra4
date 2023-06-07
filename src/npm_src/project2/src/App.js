@@ -12,6 +12,8 @@ import CoverageCategoryListCreate from "./components/coverageCategory/CoverageCa
 import CoverageCategoryDetailUpdateRemove from './components/coverageCategory/CoverageCategoryDetailUpdateRemove';
 import CoverageListCreate from "./components/coverage/CoverageListCreate";
 import CoverageDetailUpdateRemove from './components/coverage/CoverageDetailUpdateRemove';
+import PaymentListCreate from "./components/payment/PaymentListCreate";
+import PaymentDetailUpdateRemove from "./components/payment/PaymentDetailUpdateRemove";
 import VehicleListCreate from './components/vehicle/VehicleListCreate';
 import VehicleDetailUpdateRemove from './components/vehicle/VehicleDetailUpdateRemove';
 
@@ -65,6 +67,8 @@ function App() {
             <Route path="/coverageCategory/:name" element={<CoverageCategoryDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverage" element={<CoverageListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/coverage/:name" element={<CoverageDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/payment" element={<PaymentListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
+            <Route path="/payment/:id" element={<PaymentDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/vehicle" element={<VehicleListCreate currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
             <Route path="/vehicle/:id" element={<VehicleDetailUpdateRemove currentUser={currentUser} showAdminContent={showAdminContent} showStandardContent={showStandardContent}  />} />
 

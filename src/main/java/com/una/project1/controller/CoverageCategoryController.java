@@ -68,31 +68,29 @@ public class CoverageCategoryController {
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @PutMapping("/{coverageCategoryId}")
-    public ResponseEntity<CoverageCategory> updateCoverageCategory(
-            @PathVariable Long coverageCategoryId,
+    @PutMapping("/{name}")
+    public ResponseEntity<?> updateCoverageCategory(
+            @PathVariable String name,
             @Valid @RequestBody CoverageCategory coverageCategory
     ) {
-        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
+        Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findByName(name);
         if (!existingCoverageCategory.isPresent()) {
-            throw new RuntimeException("CoverageCategory not found");
+            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
-        CoverageCategory updatedCoverageCategory = coverageCategoryService.save(coverageCategory);
-        return ResponseEntity.ok(updatedCoverageCategory);
+        coverageCategoryService.save(coverageCategory);
+        return ResponseEntity.ok().body(existingCoverageCategory.get());
+
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @DeleteMapping("/{coverageCategoryId}")
+    @DeleteMapping("/{coverageCategoryId}/delete")
     public ResponseEntity<?> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
         Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
         if (!optionalCoverageCategory.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Coverage category not found'}");
+            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
 
         coverageCategoryService.deleteById(coverageCategoryId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Coverage Category Successfully Deleted'}");    }
+        return ResponseEntity.ok().body("{message: \"Coverage Category successfully deleted\"}");
+    }
 }

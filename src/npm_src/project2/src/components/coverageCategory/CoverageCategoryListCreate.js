@@ -55,7 +55,7 @@ function CoverageCategoryListCreate() {
                                 </td>
                             </tr>
                         )): (
-                            <tr>No categories exist</tr>
+                            <tr>No coverages exist</tr>
                         )}
                         </tbody>
                     </table>
