@@ -35,7 +35,7 @@ function PaymentListCreate() {
                 <th scope="col">Owner</th>
                 <th scope="col">Expiration Date</th>
                   <th scope="col">Billing Address</th>
-                <th scope="col"></th>
+                <th scope="col">Details</th>
               </tr>
               </thead>
               <tbody>
@@ -43,8 +43,8 @@ function PaymentListCreate() {
                   <tr>
                     <td>{payment.id}</td>
                     <th>
-                      <Link to={`/payment/${payment.number}`} className="link-secondary">
-                        {payment.number}
+                      <Link to={`/payment/${payment.id}`} className="link-secondary">
+                        {payment.safeNumber}
                       </Link>
                     </th>
                     <td>{payment.owner}</td>
@@ -52,7 +52,7 @@ function PaymentListCreate() {
                     <td>{payment.billingAddress}</td>
                     <td>
                       <th scope="row">
-                        <Link to={`/payment/${payment.number}`} className="link-secondary">
+                        <Link to={`/payment/${payment.id}`} className="link-secondary">
                           View Details
                         </Link>
                       </th>

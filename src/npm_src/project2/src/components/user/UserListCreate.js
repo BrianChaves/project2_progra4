@@ -32,7 +32,7 @@ function UserListCreate() {
                                 <th scope="col">Username</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Roles</th>
-                                <th scope="col"></th>
+                                <th scope="col">Details</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom';
 import RestService from '../../services/rest-service';
-import * as bootstrap from 'bootstrap/dist/js/bootstrap'
+import * as bootstrap from 'bootstrap/dist/js/bootstrap';
 
 function InsuranceDetailUpdateRemove({currentUser, showAdminContent, showStandardContent}) {
   const params = useParams();

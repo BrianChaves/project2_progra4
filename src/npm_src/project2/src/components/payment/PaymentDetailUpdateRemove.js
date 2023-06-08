@@ -14,14 +14,14 @@ function PaymentDetailUpdateRemove({currentUser}) {
   const [paymentData, setPaymentData] = useState(null);
 
   useEffect(() => {
-    RestService.getObjectDetail(`payment/${params.number}`)
+    RestService.getObjectDetail(`payment/${params.id}`)
         .then((paymentObject) => {
           if (paymentObject != null){
             setPaymentData(paymentObject);
           }
         })
 
-  }, [params.number])
+  }, [params.id])
   return (
       <>
 
@@ -37,7 +37,7 @@ function PaymentDetailUpdateRemove({currentUser}) {
               <div className="col-10">
                   { paymentData ? (
                       <>
-                          <p>Number: {paymentData.number}</p>
+                          <p>Number: {paymentData.safeNumber}</p>
                           <p>Owner : {paymentData.owner}</p>
                           <p>Expiration Date: {paymentData.expirationDate}</p>
                           <p>Billing Address: {paymentData.billingAddress}</p>

@@ -42,9 +42,9 @@ function InsuranceListCreate() {
                         <th scope="col">Number Plate</th>
                         <th scope="col">Date</th>
                         <th scope="col">Vehicle</th>
-                        <th scope="col"></th>
+                        <th scope="col">Image</th>
                         <th scope="col">Valuation</th>
-                        <th scope="col"></th>
+                        <th scope="col">Details</th>
                     </tr>
                     <tbody>
                         {insuranceList.length !== 0 ? insuranceList.filter((insurance) => searchInput.length === 0 || insurance.numberPlate.includes(searchInput)).map((insurance) => (

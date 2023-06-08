@@ -16,6 +16,13 @@ function CoverageDetailUpdateRemove({currentUser}) {
         .then((coverageObject) => {
           if (coverageObject != null){
               setCoverageData(coverageObject);
+              RestService.getObjectDetail(`/coverage/category/coverage/${params.name}`)
+              .then((categoryObject) => {
+                if (categoryObject != null){
+                    console.log(categoryObject)
+                    setCoverageData((previousData) => ({...previousData, coverageCategory: categoryObject}));
+                }
+              })
           }
         })
 
@@ -39,24 +46,7 @@ function CoverageDetailUpdateRemove({currentUser}) {
                       <p>Description : {coverageData.description}</p>
                       <p>Minimun Price: {coverageData.minimumPrice}</p>
                       <p>Percentage Price: {coverageData.valuationPercentagePrice}</p>
-
-
-                       {
-                          coverageData.coverageCategory?.length >= 0
-                              ? (
-                                  <>
-                                      <p>Acquired Categories:</p>
-                                      <ul>
-                                          {coverageData.coverageCategory?.map(coverageCategory => (
-                                              <li>
-                                                  <li key={coverageCategory.id}>{coverageCategory.name}</li>
-                                              </li>))}
-                                      </ul>
-                                  </>
-                              ) : (
-                                  <p>Categories: None acquired.</p>
-                              )
-                      }
+                      <p>Category: {coverageData?.coverageCategory?.name}</p>
                     <div className="row col-12 justify-content-center">
                       <button type="button" className="btn btn-primary col-3 m-2" data-bs-toggle="modal" data-bs-target="#updateModal">
                         Update

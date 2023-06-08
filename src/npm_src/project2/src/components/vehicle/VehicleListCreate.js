@@ -35,7 +35,7 @@ function VehicleListCreate() {
                             <th scope="col">Brand</th>
                             <th scope="col">Model</th>
                             <th scope="col">Image</th>
-                            <th scope="col"></th>
+                            <th scope="col">Details</th>
 
                         </tr>
                         </thead>

@@ -56,6 +56,19 @@ public class CoverageCategoryController {
     }
 
 
+    @PreAuthorize("hasAuthority('AdministratorClient')")
+    @GetMapping("/coverage/{coverageName}")
+    public ResponseEntity<?> coverageCategoryGetByCoverageName(@PathVariable("coverageName") String coverageName) {
+        List<CoverageCategory> coverageCategories = coverageCategoryService.findAll();
+        for (CoverageCategory category : coverageCategories) {
+            for (Coverage coverage : category.getCoverages()) {
+                if (coverage.getName().equals(coverageName)){
+                    return ResponseEntity.ok().body(category);
+                }
+            }
+        }
+        return ResponseEntity.badRequest().body("{message: \"CoverageCategory does not exist\"}");
+    }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{name}")

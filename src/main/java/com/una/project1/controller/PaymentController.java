@@ -58,27 +58,26 @@ public class PaymentController {
     }
 
 
-
+    @Transactional
     @PreAuthorize("hasAuthority('StandardClient')")
-    @GetMapping("/{number}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> paymentDetail(
-            @AuthenticationPrincipal User user,
-            @PathVariable("number") String number
+            Authentication authentication,
+            @PathVariable("id") Long id
     ) {
-        Optional<Payment> optionalPayment = paymentService.findByNumber(number);
+        Optional<Payment> optionalPayment = paymentService.findById(id);
         if (!optionalPayment.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
 
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
-        if (!user.getUsername().equals(paymentUser.getUsername())) {
+        if (!authentication.getName().equals(paymentUser.getUsername())) {
             return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
 
         return ResponseEntity.ok().body(optionalPayment.get());
     }
-    //nose si esta correcto el de detail
 
     @PreAuthorize("hasAuthority('StandardClient')")
     @PutMapping("/{paymentId}")

@@ -44,14 +44,9 @@ public class VehicleController {
                                                  @RequestParam("image") MultipartFile file) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (result.hasErrors()) {
-            String errorString = "{'errors':[";
-            for (ObjectError error: result.getAllErrors()) {
-                errorString += String.format("{'%s': '%s'},", error.getObjectName(), error.getDefaultMessage());
-            }
-            errorString += "]}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(errorString);
+                    .body(result.getAllErrors());
         }
         Vehicle createdVehicle = vehicleService.createVehicle(vehicle, file);
         return ResponseEntity.ok(createdVehicle);
@@ -67,63 +62,62 @@ public class VehicleController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{vehicleId}")
-    public Vehicle vehicleDetail(@PathVariable Long vehicleId){
+    public ResponseEntity<?> vehicleDetail(@PathVariable Long vehicleId){
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
-        return optionalVehicle.orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        if (!optionalVehicle.isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("[{field: 'vehicle', defaultMessage: 'Vehicle not found'}]");
+        }
+        return ResponseEntity.ok(optionalVehicle.get());
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PutMapping("/{vehicleId}")
     public ResponseEntity<?> updateVehicle(
             @PathVariable Long vehicleId,
-            @Valid @RequestBody Vehicle vehicle,
+            @Valid @ModelAttribute Vehicle vehicle,
             BindingResult result,
             @RequestParam("image") MultipartFile file
 
     ) throws IOException {
         Optional<Vehicle> existingVehicle = vehicleService.findById(vehicleId);
         if (!existingVehicle.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'errors':[ {'vehicle': 'Vehicle Not Found'}]}");
+            result.rejectValue("vehicle", "error.Vehicle", "Vehicle not found.");
         }
         if (result.hasErrors()) {
-            String errorString = "{'errors':[";
-            for (ObjectError error: result.getAllErrors()) {
-                errorString += String.format("{'%s': '%s'},", error.getObjectName(), error.getDefaultMessage());
-            }
-            errorString += "]}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(errorString);
+                    .body(result.getAllErrors());
         }
         vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
        return ResponseEntity.status(HttpStatus.OK)
                .contentType(MediaType.APPLICATION_JSON)
-               .body("{'message': 'Vehicle Successfully Updated'}");
+               .body("{message: 'Vehicle Successfully Updated'}");
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
-    @DeleteMapping("/{vehicleId}")
+    @DeleteMapping("/{vehicleId}/delete")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("{'message': 'Vehicle not found'}");
+                    .body("[{field: 'vehicle', defaultMessage: 'Vehicle not found'}]");
         }
         Vehicle vehicle = optionalVehicle.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getVehicle().equals(vehicle)) {
-                throw new RuntimeException("Vehicle is associated with an insurance");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("[{field: 'vehicle', defaultMessage: 'Vehicle is associated with an insurance'}]");
             }
         }
         vehicleService.deleteById(vehicle.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("{'message': 'Vehicle Successfully Deleted'}");
+                .body("{message: 'Vehicle Successfully Deleted'}");
     }
-
 }
 
 

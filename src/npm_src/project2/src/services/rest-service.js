@@ -62,7 +62,7 @@ const createObject = async (path='', data={}) => {
 const updateObject = async (path='', data={}) => {
     try {
         const response = await axios.put(path, data, {
-            headers: {
+            [!path.startsWith("/vehicle") && 'headers']: {
                 'Content-Type': 'application/json'
             }
         });

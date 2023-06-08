@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 
-function PaymentUpdateModal({currentUser,paymentData}) {
+function PaymentUpdateModal({currentUser, paymentData}) {
     const [createErrors, setCreateErrors] = useState([]);
 
 

@@ -35,7 +35,7 @@ function CoverageListCreate() {
                 <th scope="col">Description</th>
                   <th scope="col">Minimum Price</th>
                   <th scope="col">Percentage Price</th>
-                  <th scope="col"></th>
+                  <th scope="col">Details</th>
               </tr>
               </thead>
               <tbody>

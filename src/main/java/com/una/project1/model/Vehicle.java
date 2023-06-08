@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -81,6 +82,18 @@ public class Vehicle {
 
     public void setInsurances(Set<Insurance> insurances) {
         this.insurances = insurances;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Vehicle vehicle)) return false;
+        return getId().equals(vehicle.getId()) && getBrand().equals(vehicle.getBrand()) && getModel().equals(vehicle.getModel());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getBrand(), getModel());
     }
 
     @Override
