@@ -16,15 +16,19 @@ function PaymentCreateModal() {
         },
         validationSchema: Yup.object({
             number: Yup.string()
-                .required('Number is required'),
+                .required('Card number is required')
+                .min(16, "Credit card number must be at least 16 digits")
+                .max(20, "Credit card number must be at most 20 digits"),
             owner: Yup.string()
                 .required('Owner is required'),
             expirationDate: Yup.string()
-                .required('Expiration Date is required'),
+                .required('Expiration date is required')
+                .matches(/^\d\d\/\d\d$/, "Expiration date must be in format \"mm/yy\""),
             securityCode: Yup.string()
-                .required('Security Code is required'),
+                .required('Security code is required')
+                .matches(/^\d{3}$|^\d{4}$/, "Security code must be in format \"###\" or \"####\""),
             billingAddress: Yup.string()
-                .required('Billing Address is Required'),
+                .required('Billing address is required'),
         }),
         onSubmit: values => {
             RestService.createObject('/payment', values)
@@ -103,7 +107,7 @@ function PaymentCreateModal() {
                             </div>
 
                             <div>
-                                <label htmlFor="securityCode" className="form-label mb-0 mt-3">Security Code </label>
+                                <label htmlFor="securityCode" className="form-label mb-0 mt-3">Security Code (CVV)</label>
                                 <input
                                     id="securityCode"
                                     name="securityCode"

@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 
-function CoverageCategoryUpdateModal({currentUser, coverageCategoryData}) {
+function CoverageCategoryUpdateModal({ coverageCategoryData}) {
     const [createErrors, setCreateErrors] = useState([]);
 
     const formik = useFormik({

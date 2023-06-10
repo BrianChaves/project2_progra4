@@ -41,13 +41,13 @@ public class CoverageCategoryController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public ResponseEntity<CoverageCategory> createCoverageCategory(
+    public ResponseEntity<?> createCoverageCategory(
             Authentication authentication,
             @Valid @RequestBody CoverageCategory coverageCategory
     ) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
         }
 
 
