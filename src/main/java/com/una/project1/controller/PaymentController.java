@@ -80,12 +80,15 @@ public class PaymentController {
     }
 
     @PreAuthorize("hasAuthority('StandardClient')")
-    @PutMapping("/{paymentId}")
-    public ResponseEntity<?> updatePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId, @Valid @RequestBody Payment updatedPayment) {
-        Optional<Payment> existingPayment = paymentService.findById(paymentId);
+    @PutMapping("/{number}")
+    public ResponseEntity<?> updatePayment(Authentication authentication,
+                                           @PathVariable("number") String number,
+                                           @Valid @RequestBody Payment updatedPayment) {
+        Optional<Payment> existingPayment = paymentService.findByNumber(number);
         if (!existingPayment.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
+
         if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())) {
             return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
@@ -94,19 +97,18 @@ public class PaymentController {
     }
 
     @PreAuthorize("hasAuthority('StandardClient')")
-    @DeleteMapping("/{paymentId}/delete")
-    public ResponseEntity<?> deletePayment(Authentication authentication, @PathVariable("paymentId") Long paymentId) {
-        Optional<Payment> optionalPayment = paymentService.findById(paymentId);
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<?> deletePayment(Authentication authentication, @PathVariable("id") Long id) {
+        Optional<Payment> optionalPayment = paymentService.findById(id);
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!optionalPayment.isPresent() || !user.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
         }
         Payment payment = optionalPayment.get();
-        User paymentUser = payment.getUser();
-        if (!(authentication.getName().equals(payment.getUser().getUsername())) || !(user.get().getPayments().size() > 1)) {
+        if (!(authentication.getName().equals(payment.getUser().getUsername()))) {
             return ResponseEntity.ok().body("{message: \"Access denied\"}");
         }
-        paymentService.deletePayment(payment);
+        paymentService.deleteById(payment.getId());
         return ResponseEntity.ok().body("{message: \"Payment successfully deleted\"}");
 
     }

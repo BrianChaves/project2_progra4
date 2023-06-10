@@ -5,6 +5,7 @@ import com.una.project1.model.Payment;
 import com.una.project1.model.User;
 import com.una.project1.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -44,7 +45,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public Payment updatePayment(Payment existingPayment, Payment payment) {
+    public Payment updatePayment(Payment existingPayment, @Valid Payment payment) {
         existingPayment.setNumber(payment.getNumber());
         existingPayment.setOwner(payment.getOwner());
         existingPayment.setExpirationDate(payment.getExpirationDate());
@@ -53,8 +54,13 @@ public class PaymentService {
         return paymentRepository.save(existingPayment);
     }
 
+    @Transactional
+    public void deleteById(Long id) {
+        paymentRepository.deleteById(id);
+    }
 
     public void deletePayment(Payment payment) {
         paymentRepository.delete(payment);
     }
 }
+
