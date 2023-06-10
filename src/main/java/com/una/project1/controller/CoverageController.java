@@ -83,7 +83,7 @@ public class CoverageController {
         if (!existingCoverage.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
-        coverageService.save(coverage); //metodo update
+        coverageService.updateCoverage(existingCoverage.get(),coverage);
         return ResponseEntity.ok().body(existingCoverage.get());
     }
 

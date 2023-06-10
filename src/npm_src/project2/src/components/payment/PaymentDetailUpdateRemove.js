@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom';
 import RestService from '../../services/rest-service';
-import CoverageUpdateModal from "../coverage/CoverageUpdateModal";
-import CoverageDeleteModal from "../coverage/CoverageDeleteModal";
 
-//import PaymentDeleteModal from "./PaymentDeleteModal";
-//import PaymentUpdateModal from "./PaymentUpdateModal";
+import PaymentUpdateModal from "./PaymentUpdateModal";
+import PaymentDeleteModal from "./PaymentDeleteModal";
+
 
 
 
@@ -52,7 +51,8 @@ function PaymentDetailUpdateRemove({currentUser}) {
                                   Delete
                               </button>
                           </div>
-
+                          <PaymentUpdateModal currentUser={currentUser} paymentData={paymentData} />
+                          <PaymentDeleteModal currentUser={currentUser}  paymentData={paymentData} />
                       </>
                   ): (
                       <p>Loading...</p>

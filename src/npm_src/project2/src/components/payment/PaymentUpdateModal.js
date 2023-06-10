@@ -9,11 +9,11 @@ function PaymentUpdateModal({currentUser, paymentData}) {
 
     const formik = useFormik({
         initialValues: {
-            number: '',
-            owner: '',
-            expirationDate: '',
-            securityCode: '',
-            billingAddress: '',
+            number: paymentData.number,
+            owner: paymentData.owner,
+            expirationDate: paymentData.expirationDate,
+            securityCode: paymentData.securityCode,
+            billingAddress: paymentData.billingAddress,
         },
         validationSchema: Yup.object({
             number: Yup.string()
@@ -28,7 +28,7 @@ function PaymentUpdateModal({currentUser, paymentData}) {
                 .required('Billing Address is Required'),
         }),
         onSubmit: values => {
-            RestService.updateObject(`/payment/${paymentData.id}`, values)
+            RestService.updateObject(`/payment/${paymentData.number}`, values)
                 .then((data) => {
                     console.log(data);
                     setCreateErrors([]);
@@ -150,7 +150,7 @@ function PaymentUpdateModal({currentUser, paymentData}) {
                             </div>
 
                             <div>
-                                <label htmlFor="billingAddress" className="form-label mb-0 mt-3">Security Code </label>
+                                <label htmlFor="billingAddress" className="form-label mb-0 mt-3">Billing Address </label>
                                 <input
                                     id="billingAddress"
                                     name="billingAddress"
@@ -158,7 +158,7 @@ function PaymentUpdateModal({currentUser, paymentData}) {
                                     className="form-control"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.securityCode}
+                                    value={formik.values.billingAddress}
                                 />
                                 {formik.touched.billingAddress && formik.errors.billingAddress && (
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">

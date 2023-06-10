@@ -9,7 +9,7 @@ function CoverageCategoryUpdateModal({currentUser, coverageCategoryData}) {
     const formik = useFormik({
         initialValues: {
             name: coverageCategoryData.name,
-            phoneNumber: coverageCategoryData.description,
+            description: coverageCategoryData.description,
         },
         validationSchema: Yup.object({
             name: Yup.string()

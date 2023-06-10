@@ -1,8 +1,11 @@
 package com.una.project1.service;
 
+import com.una.project1.form.UserUpdateHelper;
 import com.una.project1.model.Coverage;
+import com.una.project1.model.User;
 import com.una.project1.repository.CoverageRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -55,6 +58,14 @@ public class CoverageService {
             result.rejectValue("name", "error.coverage", "A coverage with this name already exists.");
         }
         return result;
+    }
+    public Coverage updateCoverage(Coverage existingCoverage, @Valid Coverage dataCoverage){
+        existingCoverage.setName(dataCoverage.getName());
+        existingCoverage.setDescription(dataCoverage.getDescription());
+        existingCoverage.setMinimumPrice(dataCoverage.getMinimumPrice());
+        existingCoverage.setValuationPercentagePrice(dataCoverage.getValuationPercentagePrice());
+        existingCoverage.setCoverageCategory(dataCoverage.getCoverageCategory());
+        return coverageRepository.save(existingCoverage);
     }
 
 }

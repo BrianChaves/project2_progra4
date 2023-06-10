@@ -4,7 +4,6 @@ import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 
 function CoverageUpdateModal({currentUser,coverageData}) {
-    const [createErrors, setCreateErrors] = useState([]);
     const [coverageCategoryList, setCoverageCategoryList] = useState([]);
 
     useEffect(() => {
@@ -17,11 +16,11 @@ function CoverageUpdateModal({currentUser,coverageData}) {
     }, [])
     const formik = useFormik({
         initialValues: {
-            name: '',
-            description: '',
-            minimumPrice: '',
-            valuationPercentagePrice: '',
-            coverageCategory: '',
+            name: coverageData.name,
+            description: coverageData.description,
+            minimumPrice: coverageData.minimumPrice,
+            valuationPercentagePrice: coverageData.valuationPercentagePrice,
+            coverageCategory: coverageData.coverageCategory,
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -39,13 +38,9 @@ function CoverageUpdateModal({currentUser,coverageData}) {
             RestService.updateObject(`/coverage/${coverageData.name}`, values)
                 .then((data) => {
                     console.log(data);
-                    setCreateErrors([]);
                     window.location.replace('/coverage/');
                 })
-                .catch((data) => {
-                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-                    setCreateErrors(errors);
-                })
+
         },
     });
     return (
@@ -75,13 +70,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.name}</div>
                                 </div>
                             )}
-                            {createErrors.filter((error) => error.field === "name").length > 0 && (
-                                <ul class="alert alert-danger ps-4">
-                                    {createErrors.filter((error) => error.field === "name").map((error)=> (
-                                        <li>{error.message}</li>
-                                    ))}
-                                </ul>
-                            )}
+
                         </div>
                         <div>
                             <label htmlFor="description" className="form-label mb-0 mt-3">Description</label>
@@ -99,13 +88,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.description}</div>
                                 </div>
                             )}
-                            {createErrors.filter((error) => error.field === "description").length > 0 && (
-                                <ul class="alert alert-danger ps-4">
-                                    {createErrors.filter((error) => error.field === "description").map((error)=> (
-                                        <li>{error.message}</li>
-                                    ))}
-                                </ul>
-                            )}
+
                         </div>
                         <div>
                             <label htmlFor="minimumPrice" className="form-label mb-0 mt-3">Minimum Price</label>
@@ -123,13 +106,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.minimumPrice}</div>
                                 </div>
                             )}
-                            {createErrors.filter((error) => error.field === "minimumPrice").length > 0 && (
-                                <ul class="alert alert-danger ps-4">
-                                    {createErrors.filter((error) => error.field === "minimumPrice").map((error)=> (
-                                        <li>{error.message}</li>
-                                    ))}
-                                </ul>
-                            )}
+
                         </div>
                         <div>
                             <label htmlFor="valuationPercentagePrice" className="form-label mb-0 mt-3">Percentage Price</label>
@@ -147,13 +124,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.valuationPercentagePrice}</div>
                                 </div>
                             )}
-                            {createErrors.filter((error) => error.field === "valuationPercentagePrice").length > 0 && (
-                                <ul class="alert alert-danger ps-4">
-                                    {createErrors.filter((error) => error.field === "valuationPercentagePrice").map((error)=> (
-                                        <li>{error.message}</li>
-                                    ))}
-                                </ul>
-                            )}
+
                         </div>
 
                         <div>
@@ -167,25 +138,18 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     onBlur={formik.handleBlur}
                                     value={formik.values.coverageCategory}
                                 >
-                                    {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory.name}>{coverageCategory.name}</option>)}
+                                    {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory?.name}>{coverageCategory?.name}</option>)}
                                 </select>
                             ) : (
                                 <p>No Coverage Category exist.</p>
                             )}
+
                             {formik.touched.coverageCategory && formik.errors.coverageCategory && (
                                 <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                     <div className="error">{formik.errors.coverageCategory}</div>
                                 </div>
                             )}
-                            {createErrors.filter((error) => error.field === "coverageCategory").length > 0 && (
-                                <ul className="alert alert-danger ps-4">
-                                    {createErrors.filter((error) => error.field === "coverageCategory").map((error) => (
-                                        <li>{error.message}</li>
-                                    ))}
-                                </ul>
-                            )}
                         </div>
-
 
                         </div>
 

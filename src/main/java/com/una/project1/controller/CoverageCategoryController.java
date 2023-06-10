@@ -90,7 +90,7 @@ public class CoverageCategoryController {
         if (!existingCoverageCategory.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
         }
-        coverageCategoryService.save(coverageCategory);
+        coverageCategoryService.updateCoverageCategory(existingCoverageCategory.get(),coverageCategory);
         return ResponseEntity.ok().body(existingCoverageCategory.get());
 
     }
