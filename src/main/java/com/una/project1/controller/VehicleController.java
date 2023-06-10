@@ -44,9 +44,8 @@ public class VehicleController {
                                                  @RequestParam("image") MultipartFile file) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(result.getAllErrors());
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+
         }
         Vehicle createdVehicle = vehicleService.createVehicle(vehicle, file);
         return ResponseEntity.ok(createdVehicle);
@@ -65,9 +64,8 @@ public class VehicleController {
     public ResponseEntity<?> vehicleDetail(@PathVariable Long vehicleId){
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("[{'field': 'vehicle', 'defaultMessage': 'Vehicle not found'}]");
+            return ResponseEntity.badRequest().body("{message: \"Vehicle does not exist\"}");
+
         }
         return ResponseEntity.ok(optionalVehicle.get());
     }
@@ -86,14 +84,12 @@ public class VehicleController {
             result.rejectValue("vehicle", "error.Vehicle", "Vehicle not found.");
         }
         if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(result.getAllErrors());
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+
         }
         vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
-       return ResponseEntity.status(HttpStatus.OK)
-               .contentType(MediaType.APPLICATION_JSON)
-               .body("{'message': 'Vehicle Successfully Updated'}");
+        return ResponseEntity.ok().body("{message: \"Vehicle successfully update\"}");
+
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
@@ -101,22 +97,20 @@ public class VehicleController {
     public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("Vehicle not found");
+            return ResponseEntity.badRequest().body("{message: \"Vehicle does not exist\"}");
+
         }
         Vehicle vehicle = optionalVehicle.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getVehicle().equals(vehicle)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body("Vehicle is associated with an insurance");
+
+                return ResponseEntity.badRequest().body("{message: \"Vehicle is associated with an insurance\"}");
+
             }
         }
         vehicleService.deleteById(vehicle.getId());
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("Vehicle Successfully Deleted");
+        return ResponseEntity.ok().body("{message: \"Vehicle successfully deleted\"}");
+
     }
 }
 

@@ -51,8 +51,8 @@ function PaymentDetailUpdateRemove({currentUser}) {
                                   Delete
                               </button>
                           </div>
-                          <PaymentUpdateModal currentUser={currentUser} paymentData={paymentData} />
-                          <PaymentDeleteModal currentUser={currentUser}  paymentData={paymentData} />
+                          <PaymentUpdateModal paymentData={paymentData} />
+                          <PaymentDeleteModal   paymentData={paymentData} />
                       </>
                   ): (
                       <p>Loading...</p>
