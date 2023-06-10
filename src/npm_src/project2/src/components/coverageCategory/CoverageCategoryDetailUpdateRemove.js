@@ -55,8 +55,8 @@ function CoverageCategoryDetailUpdateRemove({currentUser}) {
                                         Delete
                                     </button>
                                 </div>
-                                <CoverageCategoryUpdateModal currentUser={currentUser} coverageCategoryData={coverageCategoryData} />
-                                <CoverageCategoryDeleteModal currentUser={currentUser}  coverageCategoryData={coverageCategoryData} />
+                                <CoverageCategoryUpdateModal coverageCategoryData={coverageCategoryData} />
+                                <CoverageCategoryDeleteModal  coverageCategoryData={coverageCategoryData} />
                                </>
                         ): (
                             <p>Loading...</p>

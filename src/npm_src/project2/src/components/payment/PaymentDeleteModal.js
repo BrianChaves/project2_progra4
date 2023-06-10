@@ -1,7 +1,7 @@
 import React from 'react'
 import RestService from '../../services/rest-service'
 
-function PaymentDeleteModal({currentUser, paymentData}) {
+function PaymentDeleteModal({ paymentData}) {
     const deletePayment = (event) => {
         event.preventDefault();
         RestService.deleteObject(`payment/${paymentData.id}/delete`)

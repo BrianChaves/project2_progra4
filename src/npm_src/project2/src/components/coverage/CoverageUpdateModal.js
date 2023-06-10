@@ -3,8 +3,10 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import RestService from '../../services/rest-service';
 
-function CoverageUpdateModal({currentUser,coverageData}) {
+function CoverageUpdateModal({coverageData}) {
     const [coverageCategoryList, setCoverageCategoryList] = useState([]);
+    const [createErrors, setCreateErrors] = useState([]);
+
 
     useEffect(() => {
         RestService.getObjectList('/coverage/category')
@@ -33,7 +35,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
             valuationPercentagePrice: Yup.string()
                 .required('valuationPercentagePrice is required'),
             coverageCategory: Yup.string()
-                .required('Required'),
+                .required('Coverage Category is Required'),
         }),
         enableReinitialze: true,
         onSubmit: values => {
@@ -42,7 +44,10 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                     console.log(data);
                     window.location.replace('/coverage/');
                 })
-
+                .catch((data) => {
+                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                    setCreateErrors(errors);
+                })
         },
     });
     return (
@@ -72,7 +77,13 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.name}</div>
                                 </div>
                             )}
-
+                               {createErrors.filter((error) => error.field === "name").length > 0 && (
+                                   <ul class="alert alert-danger ps-4">
+                                       {createErrors.filter((error) => error.field === "name").map((error)=> (
+                                           <li>{error.message}</li>
+                                       ))}
+                                   </ul>
+                               )}
                         </div>
                         <div>
                             <label htmlFor="description" className="form-label mb-0 mt-3">Description</label>
@@ -90,7 +101,13 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.description}</div>
                                 </div>
                             )}
-
+                            {createErrors.filter((error) => error.field === "description").length > 0 && (
+                                <ul class="alert alert-danger ps-4">
+                                    {createErrors.filter((error) => error.field === "description").map((error)=> (
+                                        <li>{error.message}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         <div>
                             <label htmlFor="minimumPrice" className="form-label mb-0 mt-3">Minimum Price</label>
@@ -108,7 +125,13 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.minimumPrice}</div>
                                 </div>
                             )}
-
+                            {createErrors.filter((error) => error.field === "minimumPrice").length > 0 && (
+                                <ul class="alert alert-danger ps-4">
+                                    {createErrors.filter((error) => error.field === "minimumPrice").map((error)=> (
+                                        <li>{error.message}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         <div>
                             <label htmlFor="valuationPercentagePrice" className="form-label mb-0 mt-3">Percentage Price</label>
@@ -126,7 +149,13 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.valuationPercentagePrice}</div>
                                 </div>
                             )}
-
+                            {createErrors.filter((error) => error.field === "valuationPercentagePrice").length > 0 && (
+                                <ul class="alert alert-danger ps-4">
+                                    {createErrors.filter((error) => error.field === "valuationPercentagePrice").map((error)=> (
+                                        <li>{error.message}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         <div>
@@ -159,12 +188,16 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     <div className="error">{formik.errors.coverageCategory}</div>
                                 </div>
                             )}
+                            {createErrors.filter((error) => error.field === "coverageCategory").length > 0 && (
+                                <ul className="alert alert-danger ps-4">
+                                    {createErrors.filter((error) => error.field === "coverageCategory").map((error) => (
+                                        <li>{error.message}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         </div>
-
-
-
 
 
                         <div className="modal-footer">
