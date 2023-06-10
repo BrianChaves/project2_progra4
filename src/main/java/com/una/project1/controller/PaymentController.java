@@ -79,6 +79,7 @@ public class PaymentController {
         return ResponseEntity.ok().body(optionalPayment.get());
     }
 
+    @Transactional
     @PreAuthorize("hasAuthority('StandardClient')")
     @PutMapping("/{number}")
     public ResponseEntity<?> updatePayment(Authentication authentication,
@@ -96,6 +97,7 @@ public class PaymentController {
         return ResponseEntity.ok().body(existingPayment.get());
     }
 
+    @Transactional
     @PreAuthorize("hasAuthority('StandardClient')")
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<?> deletePayment(Authentication authentication, @PathVariable("id") Long id) {

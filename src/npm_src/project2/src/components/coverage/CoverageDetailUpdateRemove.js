@@ -40,7 +40,7 @@ function CoverageDetailUpdateRemove({currentUser}) {
           </div>
           <div className="card-body row col-12 justify-content-center">
             <div className="col-10">
-              { coverageData ? (
+              { coverageData && coverageData.coverageCategory ? (
                   <>
                       <p>Name: {coverageData.name}</p>
                       <p>Description : {coverageData.description}</p>

@@ -20,9 +20,9 @@ function CoverageCreateModal() {
         initialValues: {
             name: '',
             description: '',
-            minimumPrice: '',
-            valuationPercentagePrice: '',
-            coverageCategory: '',
+            minimumPrice: 0,
+            valuationPercentagePrice: 0,
+            coverageCategory: 0,
 
         },
         validationSchema: Yup.object({
@@ -34,11 +34,11 @@ function CoverageCreateModal() {
                 .required('minimumPrice is required'),
             valuationPercentagePrice: Yup.string()
                 .required('valuationPercentagePrice is required'),
-            coverageCategory: Yup.string()
+            coverageCategory: Yup.number()
                 .required('Required'),
         }),
         onSubmit: values => {
-            RestService.createObject('/coverage', values)
+            RestService.createObject('/coverage', {...values, coverageCategory: parseInt(values.coverageCategory)})
                 .then((data) => {
                     window.location.reload();
                     setCreateErrors([]);
@@ -170,7 +170,8 @@ function CoverageCreateModal() {
                                         onBlur={formik.handleBlur}
                                         value={formik.values.coverageCategory}
                                     >
-                                        {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory.name}>{coverageCategory.name}</option>)}
+                                        <option>---</option>
+                                        {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory.id}>{coverageCategory.name}</option>)}
                                     </select>
                                 ) : (
                                     <p>No Coverage Category exist.</p>

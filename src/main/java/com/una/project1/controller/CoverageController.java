@@ -1,5 +1,6 @@
 package com.una.project1.controller;
 
+import com.una.project1.form.CoverageHelper;
 import com.una.project1.model.Coverage;
 import com.una.project1.model.CoverageCategory;
 import com.una.project1.model.Insurance;
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +53,16 @@ public class CoverageController {
     @PostMapping("")
     public ResponseEntity<?> createCoverage(
             Authentication authentication,
-            @Valid @RequestBody Coverage coverage
+            @RequestBody CoverageHelper coverageHelper
     ) {
+        CoverageCategory coverageCategory = coverageCategoryService.findById(Long.valueOf(coverageHelper.getCoverageCategory())).get();
+        Coverage coverage = new Coverage(
+                coverageHelper.getName(),
+                coverageHelper.getDescription(),
+                coverageHelper.getMinimumPrice(),
+                coverageHelper.getValuationPercentagePrice(),
+                coverageCategory
+        );
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
@@ -77,13 +87,21 @@ public class CoverageController {
     @PutMapping("/{name}")
     public ResponseEntity<?> updateCoverage(
             @PathVariable String name,
-            @Valid @RequestBody Coverage coverage
+            @RequestBody CoverageHelper coverageHelper
     ) {
         Optional<Coverage> existingCoverage = coverageService.findByName(name);
+        CoverageCategory coverageCategory = coverageCategoryService.findById(Long.valueOf(coverageHelper.getCoverageCategory())).get();
+        Coverage coverage = new Coverage(
+                coverageHelper.getName(),
+                coverageHelper.getDescription(),
+                coverageHelper.getMinimumPrice(),
+                coverageHelper.getValuationPercentagePrice(),
+                coverageCategory
+        );
         if (!existingCoverage.isPresent()) {
             return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
         }
-        coverageService.updateCoverage(existingCoverage.get(),coverage);
+        coverageService.updateCoverage(existingCoverage.get(), coverage);
         return ResponseEntity.ok().body(existingCoverage.get());
     }
 

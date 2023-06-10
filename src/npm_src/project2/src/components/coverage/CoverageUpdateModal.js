@@ -10,6 +10,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
         RestService.getObjectList('/coverage/category')
             .then((data) => {
                 if (data != null){
+                    console.log(data)
                     setCoverageCategoryList(data);
                 }
             })
@@ -20,7 +21,7 @@ function CoverageUpdateModal({currentUser,coverageData}) {
             description: coverageData.description,
             minimumPrice: coverageData.minimumPrice,
             valuationPercentagePrice: coverageData.valuationPercentagePrice,
-            coverageCategory: coverageData.coverageCategory,
+            coverageCategory: coverageData.coverageCategory?.id,
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -34,8 +35,9 @@ function CoverageUpdateModal({currentUser,coverageData}) {
             coverageCategory: Yup.string()
                 .required('Required'),
         }),
+        enableReinitialze: true,
         onSubmit: values => {
-            RestService.updateObject(`/coverage/${coverageData.name}`, values)
+            RestService.updateObject(`/coverage/${coverageData.name}`, {...values, coverageCategory: parseInt(values.coverageCategory)})
                 .then((data) => {
                     console.log(data);
                     window.location.replace('/coverage/');
@@ -138,7 +140,15 @@ function CoverageUpdateModal({currentUser,coverageData}) {
                                     onBlur={formik.handleBlur}
                                     value={formik.values.coverageCategory}
                                 >
-                                    {coverageCategoryList.map((coverageCategory) => <option value={coverageCategory?.name}>{coverageCategory?.name}</option>)}
+                                    <option>---</option>
+                                    {coverageCategoryList.map((coverageCategory) => (
+                                        <option 
+                                            value={coverageCategory?.id}
+                                            selected={coverageCategory?.id  === formik.values.coverageCategory} 
+                                        >
+                                            {coverageCategory?.name}
+                                        </option>
+                                    ))}
                                 </select>
                             ) : (
                                 <p>No Coverage Category exist.</p>
