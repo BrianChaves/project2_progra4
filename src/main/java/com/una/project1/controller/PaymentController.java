@@ -33,15 +33,14 @@ public class PaymentController {
     @Autowired
     private UserService userService;
 
-
     @PreAuthorize("hasAuthority('StandardClient')")
     @GetMapping("")
-    public List<Payment> getPaymentList(Authentication authentication) {
+    public ResponseEntity<?> getPaymentList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
-        return user.get().getPayments().stream().toList();
+        return ResponseEntity.ok().body(user.get().getPayments().stream().toList());
     }
 
 
@@ -50,13 +49,12 @@ public class PaymentController {
     public ResponseEntity<?> createPayment(Authentication authentication, @Valid @RequestBody Payment payment) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         paymentService.assignUser(payment, user.get());
         Payment createdPayment = paymentService.createPayment(payment);
         return ResponseEntity.ok(createdPayment);
     }
-
 
     @Transactional
     @PreAuthorize("hasAuthority('StandardClient')")
@@ -67,13 +65,12 @@ public class PaymentController {
     ) {
         Optional<Payment> optionalPayment = paymentService.findById(id);
         if (!optionalPayment.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
+            return ResponseEntity.badRequest().body("Payment does not exist");
         }
-
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
         if (!authentication.getName().equals(paymentUser.getUsername())) {
-            return ResponseEntity.ok().body("{message: \"Access denied\"}");
+            return ResponseEntity.ok().body("Access denied");
         }
 
         return ResponseEntity.ok().body(optionalPayment.get());
@@ -87,11 +84,10 @@ public class PaymentController {
                                            @Valid @RequestBody Payment updatedPayment) {
         Optional<Payment> existingPayment = paymentService.findByNumber(number);
         if (!existingPayment.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
+            return ResponseEntity.badRequest().body("Payment does not exist");
         }
-
         if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())) {
-            return ResponseEntity.ok().body("{message: \"Access denied\"}");
+            return ResponseEntity.ok().body("Access denied");
         }
         paymentService.updatePayment(existingPayment.get(), updatedPayment);
         return ResponseEntity.ok().body(existingPayment.get());
@@ -104,17 +100,18 @@ public class PaymentController {
         Optional<Payment> optionalPayment = paymentService.findById(id);
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!optionalPayment.isPresent() || !user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Payment does not exist\"}");
+            return ResponseEntity.badRequest().body("Payment does not exist");
         }
         Payment payment = optionalPayment.get();
         if (!(authentication.getName().equals(payment.getUser().getUsername()))) {
-            return ResponseEntity.ok().body("{message: \"Access denied\"}");
+            return ResponseEntity.ok().body("Access denied");
+        }
+        if(payment.getInsurances().size() != 0){
+            return ResponseEntity.ok().body("Payment is linked with an insurance");
         }
         paymentService.deleteById(payment.getId());
-        return ResponseEntity.ok().body("{message: \"Payment successfully deleted\"}");
-
+        return ResponseEntity.ok().body("Payment successfully deleted");
     }
-
 }
 
 

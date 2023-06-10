@@ -11,18 +11,14 @@ function CoverageCategoryDetailUpdateRemove({currentUser}) {
 
     useEffect(() => {
         RestService.getObjectDetail(`coverage/category/${params.name}`)
-            .then((coverageCategoryObject) => {
-                if (coverageCategoryObject != null){
-                    setCoverageCategoryData(coverageCategoryObject);
-                }
-            })
-
+        .then((coverageCategoryObject) => {
+            if (coverageCategoryObject != null){
+                setCoverageCategoryData(coverageCategoryObject);
+            }
+        })
     }, [params.name])
     return (
         <>
-
-
-
             <div className="card row col-8 justify-content-center bg-light rounded-0 rounded-bottom rounded-end shadow-sm p-3 m-0">
                 <div className="row col-8 mb-0 pb-0 ps-0">
 

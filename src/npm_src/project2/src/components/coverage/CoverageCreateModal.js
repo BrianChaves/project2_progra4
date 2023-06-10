@@ -203,10 +203,6 @@ function CoverageCreateModal() {
                                     </ul>
                                 )}
                             </div>
-
-
-
-
                             <div className="modal-footer">
                                 <input type="submit" className="btn btn-primary" value="Create Coverage Categories" />
                             </div>

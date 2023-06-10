@@ -7,6 +7,7 @@ import com.una.project1.service.PaymentScheduleService;
 import com.una.project1.service.RoleService;
 import com.una.project1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,12 @@ public class PaymentScheduleController {
     @Autowired
     private UserService userService;
     @GetMapping("")
-    public List<PaymentSchedule> getRoleList(Authentication authentication) {
+    public ResponseEntity<?> getRoleList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
-        return paymentScheduleService.findAll();
+        return ResponseEntity.ok().body(paymentScheduleService.findAll());
     }
 
 }

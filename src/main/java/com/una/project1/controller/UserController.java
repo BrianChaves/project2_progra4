@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<?> userDetail(@PathVariable("username") String username) {
         Optional<User> user = userService.findByUsername(username);
         if (!user.isPresent()){
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         return ResponseEntity.ok().body(user.get());
     }
@@ -79,7 +79,7 @@ public class UserController {
     ) {
         Optional<User> existingUser = userService.findByUsername(username);
         if (!existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
@@ -98,7 +98,7 @@ public class UserController {
     ) {
         Optional<User> existingUser = userService.findByUsername(username);
         if (!existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         result = userService.validatePasswordChange(existingUser.get(), userPasswordHelper, result);
         if (result.hasErrors()) {
@@ -108,6 +108,7 @@ public class UserController {
         userService.logout(session);
         return ResponseEntity.ok().body(existingUser.get());
     }
+
     @PreAuthorize("isSelfOrAdmin(#username)")
     @DeleteMapping("/{username}/delete")
     public ResponseEntity<?>  userDelete(
@@ -116,12 +117,12 @@ public class UserController {
             Authentication authentication) {
         Optional<User> user = userService.findByUsername(username);
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         userService.deleteUser(user.get());
         if (username.equals(authentication.getName())) {
             userService.logout(session);
         }
-        return ResponseEntity.ok().body("{message: \"User successfully deleted\"}");
+        return ResponseEntity.ok().body("User successfully deleted");
     }
 }

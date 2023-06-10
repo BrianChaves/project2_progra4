@@ -24,6 +24,7 @@ function UserDeleteModal({currentUser, userData}) {
                     </div>
                     <div className="modal-body">
                         <h5>Are you sure you want to delete {userData.username}'s profile?</h5>
+                        <div class="text-danger">*All insurances and payments linked belonging to this account will be deleted</div>
                     </div>
                     <div className="modal-footer">
                         <form onSubmit={deleteUser}>

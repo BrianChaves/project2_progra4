@@ -14,11 +14,9 @@ function UserUpdateModal({currentUser, userData}) {
         validationSchema: Yup.object({
             name: Yup.string()
                 .required('Required'),
-            phoneNumber: Yup.string()
-                .required('Required'),
+            phoneNumber: Yup.string(),
             email: Yup.string()
-                .email()
-                .required('Required'),
+                .email(),
         }),
         onSubmit: values => {
             RestService.updateObject(`/user/${userData.username}`, values)

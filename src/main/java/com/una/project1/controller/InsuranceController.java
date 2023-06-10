@@ -43,7 +43,7 @@ public class InsuranceController {
                                               @RequestParam(value = "search", required = false) String search) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         List<Insurance> insurances = insuranceService.findByUser(user.get());
         if (search != null && !search.isBlank()) {
@@ -60,7 +60,7 @@ public class InsuranceController {
             @RequestParam(value = "search", required = false) String search) {
         Optional<User> user = userService.findByUsername(username);
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         List<Insurance> insurances = insuranceService.findByUser(user.get());
         if (search != null && !search.isBlank()) {
@@ -77,7 +77,7 @@ public class InsuranceController {
                                      Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
         Optional<Payment> payment = paymentService.findById(Long.valueOf(insuranceHelper.getPayment()));
         Optional<PaymentSchedule> paymentSchedule = paymentScheduleService.findById((long) insuranceHelper.getPaymentSchedule());
@@ -124,11 +124,11 @@ public class InsuranceController {
         Optional<Insurance> optionalInsurance = insuranceService.findByNumberPlate(numberPlate);
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!optionalInsurance.isPresent() || !user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Insurance or User does not exist\"}");
+            return ResponseEntity.badRequest().body("Insurance or User does not exist");
         }
         Insurance insurance = optionalInsurance.get();
         if (!authentication.getName().equals(insurance.getClient().getUsername())) {
-            return ResponseEntity.badRequest().body("{message: \"Access Denied\"}");
+            return ResponseEntity.badRequest().body("Access Denied");
         }
         return ResponseEntity.ok().body(insurance);
     }
@@ -140,11 +140,11 @@ public class InsuranceController {
         Optional<User> user = userService.findByUsername(authentication.getName());
         Optional<Insurance> existingInsurance = insuranceService.findByNumberPlate(numberPlate);
         if (!user.isPresent() || !existingInsurance.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Insurance or User does not exist\"}");
+            return ResponseEntity.badRequest().body("Insurance or User does not exist");
         }
         Insurance insurance = existingInsurance.get();
         if (!authentication.getName().equals(insurance.getClient().getUsername())) {
-            return ResponseEntity.badRequest().body("{message: \"Access Denied\"}");
+            return ResponseEntity.badRequest().body("Access Denied");
         }
         insuranceService.updateInsurance(insurance, updatedInsurance);
         return ResponseEntity.ok().body(insurance);
@@ -155,13 +155,13 @@ public class InsuranceController {
     public ResponseEntity<?> deleteInsurance(@PathVariable("numberPlate") String numberPlate, Authentication authentication) {
         Optional<Insurance> optionalInsurance = insuranceService.findByNumberPlate(numberPlate);
         if (!optionalInsurance.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Insurance not found\"}");
+            return ResponseEntity.badRequest().body("Insurance not found");
         }
         Insurance insurance = optionalInsurance.get();
         if (!authentication.getName().equals(insurance.getClient().getUsername())) {
-            return ResponseEntity.badRequest().body("{message: \"Access Denied\"}");
+            return ResponseEntity.badRequest().body("Access Denied");
         }
         insuranceService.deleteInsurance(insurance);
-        return ResponseEntity.ok().body("{message: \"Insurance successfully deleted\"}");
+        return ResponseEntity.ok().body("Insurance successfully deleted");
     }
 }

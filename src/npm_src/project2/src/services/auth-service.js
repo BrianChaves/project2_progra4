@@ -3,13 +3,24 @@ import jwt_decode from "jwt-decode";
 
 axios.defaults.baseURL = 'http://127.0.0.1:8080/api/';
 
-const register = (data={}) => {
-  return axios.post("auth/register", data);
+const register = async (data={}) => {
+  try {
+    const response = await axios.post("auth/register", data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    if (error.response && error.response.status === 401) {
+        if (!AuthService.isJwtValid()){
+            AuthService.logout();
+            window.location.replace('/index.html?page=login&logout=true&expired=true')
+        }
+    }
+    throw error.response.data;
+  }
 };
 
 const login = (username, password) => {
-  return axios
-    .post("auth/login", {
+    return axios.post("auth/login", {
       username,
       password,
     })

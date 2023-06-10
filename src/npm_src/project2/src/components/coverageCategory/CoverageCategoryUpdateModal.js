@@ -5,7 +5,8 @@ import RestService from '../../services/rest-service';
 
 function CoverageCategoryUpdateModal({ coverageCategoryData}) {
     const [createErrors, setCreateErrors] = useState([]);
-
+    const [error, setError] = useState("");
+    
     const formik = useFormik({
         initialValues: {
             name: coverageCategoryData.name,
@@ -23,11 +24,17 @@ function CoverageCategoryUpdateModal({ coverageCategoryData}) {
                 .then((data) => {
                     console.log(data);
                     setCreateErrors([]);
+                    setError("");
                     window.location.replace('/coverageCategory/');
                 })
                 .catch((data) => {
-                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-                    setCreateErrors(errors);
+                    if (Array.isArray(data)){
+                        const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                        setCreateErrors(errors);
+                    }
+                    else{
+                        setError(data);
+                    }
                 })
         },
     });
@@ -42,6 +49,11 @@ function CoverageCategoryUpdateModal({ coverageCategoryData}) {
                         </div>
                         <div className="modal-body">
                             <div>
+                                {error && (
+                                <ul class="alert alert-danger ps-4">
+                                    <li>{error}</li>
+                                </ul>
+                                )}
                                 <label htmlFor="name" className="form-label mb-0 mt-3">Name</label>
                                 <input
                                     id="name"

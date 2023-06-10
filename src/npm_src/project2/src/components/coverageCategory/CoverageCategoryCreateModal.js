@@ -5,8 +5,7 @@ import RestService from '../../services/rest-service';
 
 function CoverageCategoryCreateModal() {
     const [createErrors, setCreateErrors] = useState([]);
-
-
+    const [error, setError] = useState("");
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -22,12 +21,18 @@ function CoverageCategoryCreateModal() {
         onSubmit: values => {
             RestService.createObject('/coverage/category', values)
                 .then((data) => {
+                    setError("")
                     setCreateErrors([]);
                     window.location.reload();
                 })
                 .catch((data) => {
-                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-                    setCreateErrors(errors);
+                    if (Array.isArray(data)){
+                        const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                        setCreateErrors(errors);
+                    }
+                    else{
+                        setError(data);
+                    }
                 })
         },
     });
@@ -41,8 +46,12 @@ function CoverageCategoryCreateModal() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-
                             <div>
+                                {error && (
+                                    <ul class="alert alert-danger ps-4">
+                                      <li>{error}</li>
+                                    </ul>
+                                )}
                                 <label htmlFor="name" className="form-label mb-0 mt-3">Name</label>
                                 <input
                                     id="name"
@@ -90,10 +99,8 @@ function CoverageCategoryCreateModal() {
                                     </ul>
                                 )}
                             </div>
-
-
                             <div className="modal-footer">
-                                <input type="submit" className="btn btn-primary" value="Create Coverage Categories" />
+                                <input type="submit" className="btn btn-primary" value="Create Categories" />
                             </div>
                         </div>
                     </form>

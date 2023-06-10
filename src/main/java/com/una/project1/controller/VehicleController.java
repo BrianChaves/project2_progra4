@@ -39,33 +39,34 @@ public class VehicleController {
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
-    public ResponseEntity<?> createVehicle(@Valid @ModelAttribute Vehicle vehicle,
-                                                 BindingResult result,
-                                                 @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<?> createVehicle(
+            @Valid @ModelAttribute Vehicle vehicle,
+            BindingResult result,
+            @RequestParam("image") MultipartFile file
+    ) throws IOException {
         result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
-
         }
         Vehicle createdVehicle = vehicleService.createVehicle(vehicle, file);
         return ResponseEntity.ok(createdVehicle);
     }
 
     @GetMapping("/image/{id}")
-        public ResponseEntity<InputStreamResource> showVehicleImage(@PathVariable String id) {
-            InputStream is = new ByteArrayInputStream(vehicleService.getImage(Long.valueOf(id)));
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(new InputStreamResource(is));
-        }
+    public ResponseEntity<InputStreamResource> showVehicleImage(@PathVariable String id) {
+        InputStream is = new ByteArrayInputStream(vehicleService.getImage(Long.valueOf(id)));
+        return ResponseEntity.status(HttpStatus.OK)
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(new InputStreamResource(is)
+        );
+    }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/{vehicleId}")
     public ResponseEntity<?> vehicleDetail(@PathVariable Long vehicleId){
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()){
-            return ResponseEntity.badRequest().body("{message: \"Vehicle does not exist\"}");
-
+            return ResponseEntity.badRequest().body("Vehicle does not exist");
         }
         return ResponseEntity.ok(optionalVehicle.get());
     }
@@ -77,7 +78,6 @@ public class VehicleController {
             @Valid @ModelAttribute Vehicle vehicle,
             BindingResult result,
             @RequestParam("image") MultipartFile file
-
     ) throws IOException {
         Optional<Vehicle> existingVehicle = vehicleService.findById(vehicleId);
         if (!existingVehicle.isPresent()) {
@@ -85,11 +85,9 @@ public class VehicleController {
         }
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
-
         }
         vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
-        return ResponseEntity.ok().body("{message: \"Vehicle successfully update\"}");
-
+        return ResponseEntity.ok().body("Vehicle successfully updated");
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
@@ -97,20 +95,16 @@ public class VehicleController {
     public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
         Optional<Vehicle> optionalVehicle = vehicleService.findById(vehicleId);
         if (!optionalVehicle.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Vehicle does not exist\"}");
-
+            return ResponseEntity.badRequest().body("Vehicle does not exist");
         }
         Vehicle vehicle = optionalVehicle.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getVehicle().equals(vehicle)) {
-
-                return ResponseEntity.badRequest().body("{message: \"Vehicle is associated with an insurance\"}");
-
+                return ResponseEntity.badRequest().body("Vehicle is associated with an insurance");
             }
         }
         vehicleService.deleteById(vehicle.getId());
-        return ResponseEntity.ok().body("{message: \"Vehicle successfully deleted\"}");
-
+        return ResponseEntity.ok().body("Vehicle successfully deleted");
     }
 }
 

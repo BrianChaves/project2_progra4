@@ -40,12 +40,12 @@ public class CoverageController {
 
     @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
-    public List<Coverage> getCoverageList(Authentication authentication) {
+    public ResponseEntity<?> getCoverageList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("User not found");
         }
-        return coverageService.findAll();
+        return ResponseEntity.ok().body(coverageService.findAll());
     }
 
 
@@ -55,6 +55,13 @@ public class CoverageController {
             Authentication authentication,
             @RequestBody CoverageHelper coverageHelper
     ) {
+        Optional<User> user = userService.findByUsername(authentication.getName());
+        if (!user.isPresent()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+        if (coverageService.findByName(coverageHelper.getName()).isPresent()) {
+            return ResponseEntity.badRequest().body("A coverage with the same name already exist");
+        }
         CoverageCategory coverageCategory = coverageCategoryService.findById(Long.valueOf(coverageHelper.getCoverageCategory())).get();
         Coverage coverage = new Coverage(
                 coverageHelper.getName(),
@@ -63,10 +70,6 @@ public class CoverageController {
                 coverageHelper.getValuationPercentagePrice(),
                 coverageCategory
         );
-        Optional<User> user = userService.findByUsername(authentication.getName());
-        if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
-        }
         Coverage createdCoverage = coverageService.save(coverage);
         return ResponseEntity.ok(createdCoverage);
     }
@@ -78,7 +81,7 @@ public class CoverageController {
     public ResponseEntity<?> coverageDetail(@PathVariable("name") String name) {
         Optional<Coverage> optionalCoverage = coverageService.findByName(name);
         if (!optionalCoverage.isPresent()){
-            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
+            return ResponseEntity.badRequest().body("Coverage does not exist");
         }
         return ResponseEntity.ok().body(optionalCoverage.get());
     }
@@ -90,6 +93,12 @@ public class CoverageController {
             @RequestBody CoverageHelper coverageHelper
     ) {
         Optional<Coverage> existingCoverage = coverageService.findByName(name);
+        if (!existingCoverage.isPresent()) {
+            return ResponseEntity.badRequest().body("Coverage does not exist");
+        }
+        if (coverageService.findByName(coverageHelper.getName()).isPresent()){
+            return ResponseEntity.badRequest().body("A coverage with the same name already exist");
+        }
         CoverageCategory coverageCategory = coverageCategoryService.findById(Long.valueOf(coverageHelper.getCoverageCategory())).get();
         Coverage coverage = new Coverage(
                 coverageHelper.getName(),
@@ -98,9 +107,6 @@ public class CoverageController {
                 coverageHelper.getValuationPercentagePrice(),
                 coverageCategory
         );
-        if (!existingCoverage.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");
-        }
         coverageService.updateCoverage(existingCoverage.get(), coverage);
         return ResponseEntity.ok().body(existingCoverage.get());
     }
@@ -110,15 +116,15 @@ public class CoverageController {
     public ResponseEntity<?> deleteCoverage(@PathVariable Long id) {
         Optional<Coverage> optionalCoverage = coverageService.findById(id);
         if (!optionalCoverage.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Coverage does not exist\"}");       }
+            return ResponseEntity.badRequest().body("Coverage does not exist");       }
         Coverage coverage = optionalCoverage.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getCoverages().contains(coverage)) {
-                return ResponseEntity.ok().body("{message: \"Coverage is associated with an insurance\"}");
+                return ResponseEntity.ok().body("Coverage is associated with an insurance");
             }
         }
         coverageService.deleteById(coverage.getId());
-        return ResponseEntity.ok().body("{message: \"Coverage successfully deleted\"}");
+        return ResponseEntity.ok().body("Coverage successfully deleted");
     }
 }
 

@@ -19,6 +19,7 @@ import com.una.project1.model.User;
 import com.una.project1.service.PaymentService;
 import com.una.project1.service.RoleService;
 import com.una.project1.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -58,18 +60,20 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-            userDetails.getUsername(),
-            roles));
+        return ResponseEntity.ok(
+            new JwtResponse(
+                jwt,
+                userDetails.getUsername(),
+                roles
+            )
+        );
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser( @RequestBody UserRegisterHelper signUpRequest) {
-        if (userService.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("{'errors':[ {'username': 'Username already exists'}]}"));
-        }
+    public ResponseEntity<?> registerUser(
+            @Valid @RequestBody UserRegisterHelper signUpRequest,
+            BindingResult result
+        ) {
         Set<Role> roles = new HashSet<>();
         User user = new User(
             signUpRequest.getName(),
@@ -85,6 +89,10 @@ public class AuthController {
                 signUpRequest.getSecurityCode(),
                 signUpRequest.getBillingAddress()
         );
+        userService.validateCreation(signUpRequest, result, "create");
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+        }
         user = userService.assignRole(user, "StandardClient");
         userService.createUser(user);
         payment = paymentService.assignUser(payment, user);

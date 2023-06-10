@@ -27,17 +27,15 @@ public class CoverageCategoryController {
     @Autowired
     private UserService userService;
 
- @PreAuthorize("authentication.principal.username != ''")
+    @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
- public List<CoverageCategory> getCoverageCategoryList(Authentication authentication) {
-     Optional<User> user = userService.findByUsername(authentication.getName());
-     if (!user.isPresent()) {
-         throw new RuntimeException("User not found");
+     public ResponseEntity<?> getCoverageCategoryList(Authentication authentication) {
+         Optional<User> user = userService.findByUsername(authentication.getName());
+         if (!user.isPresent()) {
+             return ResponseEntity.badRequest().body("User not found");
+         }
+         return ResponseEntity.ok().body(coverageCategoryService.findAll());
      }
-     return coverageCategoryService.findAll();
- }
-
-
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @PostMapping("")
@@ -47,14 +45,14 @@ public class CoverageCategoryController {
     ) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"User does not exist\"}");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
-
-
+        if (coverageCategoryService.findByName(coverageCategory.getName()).isPresent()){
+            return ResponseEntity.badRequest().body("A Category with the same name already exists");
+        }
         return ResponseEntity.ok().body(coverageCategoryService.save(coverageCategory));
 
     }
-
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
     @GetMapping("/coverage/{coverageName}")
@@ -67,7 +65,7 @@ public class CoverageCategoryController {
                 }
             }
         }
-        return ResponseEntity.badRequest().body("{message: \"CoverageCategory does not exist\"}");
+        return ResponseEntity.badRequest().body("Category does not exist");
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
@@ -75,7 +73,7 @@ public class CoverageCategoryController {
     public ResponseEntity<?> coverageCategoryDetail(@PathVariable("name") String name) {
         Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findByName(name);
         if (!optionalCoverageCategory.isPresent()){
-            return ResponseEntity.badRequest().body("{message: \"CoverageCategory does not exist\"}");
+            return ResponseEntity.badRequest().body("Category does not exist");
         }
         return ResponseEntity.ok().body(optionalCoverageCategory.get());
     }
@@ -88,11 +86,13 @@ public class CoverageCategoryController {
     ) {
         Optional<CoverageCategory> existingCoverageCategory = coverageCategoryService.findByName(name);
         if (!existingCoverageCategory.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
+            return ResponseEntity.badRequest().body("Category does not exist");
+        }
+        if (coverageCategoryService.findByName(coverageCategory.getName()).isPresent()){
+            return ResponseEntity.badRequest().body("A Category with the same name already exists");
         }
         coverageCategoryService.updateCoverageCategory(existingCoverageCategory.get(),coverageCategory);
         return ResponseEntity.ok().body(existingCoverageCategory.get());
-
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
@@ -100,10 +100,12 @@ public class CoverageCategoryController {
     public ResponseEntity<?> deleteCoverageCategory(@PathVariable Long coverageCategoryId) {
         Optional<CoverageCategory> optionalCoverageCategory = coverageCategoryService.findById(coverageCategoryId);
         if (!optionalCoverageCategory.isPresent()) {
-            return ResponseEntity.badRequest().body("{message: \"Coverage Category does not exist\"}");
+            return ResponseEntity.badRequest().body("Coverage Category does not exist");
         }
-
+        if (optionalCoverageCategory.get().getCoverages().size() != 0){
+            return ResponseEntity.badRequest().body("Coverage Category has coverages assigned");
+        }
         coverageCategoryService.deleteById(coverageCategoryId);
-        return ResponseEntity.ok().body("{message: \"Coverage Category successfully deleted\"}");
+        return ResponseEntity.ok().body("Coverage Category successfully deleted");
     }
 }

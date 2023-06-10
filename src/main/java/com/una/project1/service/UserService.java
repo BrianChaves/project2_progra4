@@ -1,6 +1,7 @@
 package com.una.project1.service;
 
 import com.una.project1.form.UserCreateHelper;
+import com.una.project1.form.UserRegisterHelper;
 import com.una.project1.model.Role;
 import com.una.project1.model.User;
 import com.una.project1.form.UserPasswordHelper;
@@ -37,6 +38,17 @@ public class UserService {
     }
 
     public BindingResult validateCreation(UserCreateHelper user, BindingResult result, String type){
+        Optional<User> optionalUser = this.findByUsername(user.getUsername());
+        if (!Objects.equals(user.getPasswordHash(), user.getPassword2())){
+            result.rejectValue("passwordHash", "error.user", "Passwords must match.");
+        }
+        if (optionalUser.isPresent() && type == "create"){
+            result.rejectValue("username", "error.user", "This username already exists.");
+        }
+        return result;
+    }
+
+    public BindingResult validateCreation(UserRegisterHelper user, BindingResult result, String type){
         Optional<User> optionalUser = this.findByUsername(user.getUsername());
         if (!Objects.equals(user.getPasswordHash(), user.getPassword2())){
             result.rejectValue("passwordHash", "error.user", "Passwords must match.");

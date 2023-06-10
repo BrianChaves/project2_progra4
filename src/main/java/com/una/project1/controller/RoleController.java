@@ -7,6 +7,7 @@ import com.una.project1.service.CoverageCategoryService;
 import com.una.project1.service.RoleService;
 import com.una.project1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +26,12 @@ public class RoleController {
     private UserService userService;
     @PreAuthorize("authentication.principal.username != ''")
     @GetMapping("")
-    public List<Role> getRoleList(Authentication authentication) {
+    public ResponseEntity<?> getRoleList(Authentication authentication) {
         Optional<User> user = userService.findByUsername(authentication.getName());
         if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+            return ResponseEntity.badRequest().body("User does not exist");
         }
-        return roleService.findAll();
+        return ResponseEntity.ok().body(roleService.findAll());
     }
 
 }

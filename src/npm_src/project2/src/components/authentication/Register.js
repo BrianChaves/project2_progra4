@@ -6,7 +6,7 @@ import RestService from '../../services/rest-service';
 import AuthService from '../../services/auth-service';
 
 function Register() {
-    const [invalidError, setInvalidError] = useState(false);
+    const [createErrors, setCreateErrors] = useState([]);
     const formik = useFormik({
         initialValues: {
             username: '',
@@ -51,13 +51,13 @@ function Register() {
         onSubmit: values => {
             AuthService.register(values)
             .then((data) => {
-                console.log(data);
-                setInvalidError(false);
+                setCreateErrors([]);
                 window.location.replace('/login?register=true');
             })
-            .catch((error) => {
-                setInvalidError(true);
-                console.log(error);
+            .catch((data) => {
+                console.log(data)
+                const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                setCreateErrors(errors);
             });
         },
     });
@@ -65,11 +65,6 @@ function Register() {
     <div className="card row col-8 justify-content-center bg-light shadow-sm my-5">
         <div className="card-body">
             <form className="row col-12 justify-content-center" onSubmit={formik.handleSubmit}>
-                {invalidError && (
-                <div className="col-12 alert alert-danger">
-                    Error: Registration could not be completed. Please try again later.
-                </div>
-                )}
                 <div className="row col-6 justify-content-center border-2 border-end">
                     <h4 className="col-8 mt-3 ms-3">Profile Information</h4>
                     <div className="col-8">
@@ -89,6 +84,13 @@ function Register() {
                             <div className="error">{formik.errors.username}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "username").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "username").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="passwordHash" className="form-label col-12 fw-bold my-auto">Password</label>
@@ -107,6 +109,13 @@ function Register() {
                             <div className="error">{formik.errors.passwordHash}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "passwordHash").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "passwordHash").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="password2" className="form-label col-12 fw-bold my-auto">Password (again)</label>
@@ -123,6 +132,13 @@ function Register() {
                         <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                             <div className="error">{formik.errors.password2}</div>
                         </div>
+                        )}
+                        {createErrors.filter((error) => error.field === "password2").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "password2").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                     <div className="col-8">
@@ -141,6 +157,13 @@ function Register() {
                             <div className="error">{formik.errors.name}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "name").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "name").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="phoneNumber" className="form-label col-12 fw-bold my-auto">Phone Number</label>
@@ -158,6 +181,13 @@ function Register() {
                             <div className="error">{formik.errors.phoneNumber}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "phoneNumber").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "phoneNumber").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="email" className="form-label col-12 fw-bold my-auto">Email</label>
@@ -174,6 +204,13 @@ function Register() {
                         <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                             <div className="error">{formik.errors.email}</div>
                         </div>
+                        )}
+                        {createErrors.filter((error) => error.field === "email").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "email").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </div>
@@ -195,6 +232,13 @@ function Register() {
                             <div className="error">{formik.errors.number}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "number").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "number").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="owner" className="form-label col-12 fw-bold my-auto">Name (In card)</label>
@@ -211,6 +255,13 @@ function Register() {
                         <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                             <div className="error">{formik.errors.owner}</div>
                         </div>
+                        )}
+                        {createErrors.filter((error) => error.field === "owner").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "owner").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                     <div className="col-8">
@@ -229,6 +280,13 @@ function Register() {
                             <div className="error">{formik.errors.expirationDate}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "expirationDate").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "expirationDate").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="securityCode" className="form-label col-12 fw-bold my-auto">Security Code (CVV)</label>
@@ -246,6 +304,13 @@ function Register() {
                             <div className="error">{formik.errors.securityCode}</div>
                         </div>
                         )}
+                        {createErrors.filter((error) => error.field === "securityCode").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "securityCode").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="col-8">
                         <label htmlFor="billingAddress" className="form-label col-12 fw-bold my-auto">Billing Address</label>
@@ -262,6 +327,13 @@ function Register() {
                         <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                             <div className="error">{formik.errors.billingAddress}</div>
                         </div>
+                        )}
+                        {createErrors.filter((error) => error.field === "billingAddress").length > 0 && (
+                            <ul class="alert alert-danger ps-4">
+                                {createErrors.filter((error) => error.field === "billingAddress").map((error)=> (
+                                    <li>{error.message}</li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </div>
