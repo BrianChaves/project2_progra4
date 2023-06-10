@@ -49,7 +49,6 @@ function VehicleListCreate() {
                                     </Link>
                                 </th>
                                 <td>{vehicle.model}</td>
-                                <td>{vehicle.description}</td>
                                 <td>
                                     <img src={`/api/vehicle/image/${vehicle.id}`} alt="" style={{width: '100px', border: '1px solid lightgray'}} />
                                 </td>

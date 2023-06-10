@@ -67,7 +67,7 @@ public class VehicleController {
         if (!optionalVehicle.isPresent()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("[{field: 'vehicle', defaultMessage: 'Vehicle not found'}]");
+                    .body("[{'field': 'vehicle', 'defaultMessage': 'Vehicle not found'}]");
         }
         return ResponseEntity.ok(optionalVehicle.get());
     }
@@ -93,7 +93,7 @@ public class VehicleController {
         vehicleService.updateVehicle(existingVehicle.get(), vehicle, file);
        return ResponseEntity.status(HttpStatus.OK)
                .contentType(MediaType.APPLICATION_JSON)
-               .body("{message: 'Vehicle Successfully Updated'}");
+               .body("{'message': 'Vehicle Successfully Updated'}");
     }
 
     @PreAuthorize("hasAuthority('AdministratorClient')")
@@ -103,20 +103,20 @@ public class VehicleController {
         if (!optionalVehicle.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body("[{field: 'vehicle', defaultMessage: 'Vehicle not found'}]");
+                    .body("Vehicle not found");
         }
         Vehicle vehicle = optionalVehicle.get();
         for (Insurance insurance : insuranceService.findAll()) {
             if (insurance.getVehicle().equals(vehicle)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body("[{field: 'vehicle', defaultMessage: 'Vehicle is associated with an insurance'}]");
+                        .body("Vehicle is associated with an insurance");
             }
         }
         vehicleService.deleteById(vehicle.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("{message: 'Vehicle Successfully Deleted'}");
+                .body("Vehicle Successfully Deleted");
     }
 }
 

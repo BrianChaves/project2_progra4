@@ -2,17 +2,16 @@ import React, { useState } from 'react'
 import RestService from '../../services/rest-service';
 
 function VehicleDeleteModal({vehicleData}) {
-  const [createErrors, setCreateErrors] = useState([]);
+  const [deleteError, setDeleteError] = useState("");
   const deleteVehicle = (event) => {
       event.preventDefault();
       RestService.deleteObject(`vehicle/${vehicleData.id}/delete`)
       .then((data) => {
-          console.log(data);
+          setDeleteError("");
           window.location.replace('/vehicle');
       })
       .catch((data) => {
-          const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-          setCreateErrors(errors);
+          setDeleteError(data);
       })
   }
   return (
@@ -25,11 +24,9 @@ function VehicleDeleteModal({vehicleData}) {
                   </div>
                   <div className="modal-body">
                       <h5>Are you sure you want to delete vehicle "{vehicleData.brand} {vehicleData.model}"?</h5>
-                      {createErrors.filter((error) => error.field === "vehicle").length > 0 && (
+                      {deleteError && (
                           <ul class="alert alert-danger ps-4">
-                              {createErrors.filter((error) => error.field === "vehicle").map((error)=> (
-                                  <li>{error.message}</li>
-                              ))}
+                            <li>{deleteError}</li>
                           </ul>
                       )}
                   </div>

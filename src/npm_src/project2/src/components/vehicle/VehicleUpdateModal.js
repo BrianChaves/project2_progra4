@@ -10,12 +10,14 @@ function VehicleUpdateModal({vehicleData}) {
     const formData = new FormData();
     
     const getCarImage = async (id) => {
-        const response = await fetch(`/vehicle/image/${id}`);
+        const response = await fetch(`/api/vehicle/image/${id}`);
         const response_image = await response.blob();
         const file = new File([response_image], 'car_image.jpg', {type: 'image/jpg'});
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
-        setSelectedImage(dataTransfer.files);
+        document.getElementById('image').files = dataTransfer.files;
+        setSelectedImage(dataTransfer.files[0]);
+        console.log(selectedImage);
     };
 
     const handleImageChange = (event) => {
@@ -40,7 +42,7 @@ function VehicleUpdateModal({vehicleData}) {
         initialValues: {
             brand: vehicleData.brand,
             model: vehicleData.model,
-            image: selectedImage,
+            image: "",
         },
         validationSchema: Yup.object({
             brand: Yup.string()
@@ -48,12 +50,12 @@ function VehicleUpdateModal({vehicleData}) {
             model: Yup.string()
                 .required('Model is required'),
             image: Yup.mixed()
-                .required('Image is required'),
+                .test("not_undefined", "Image is required", val => selectedImage !== undefined),
         }),
         onSubmit: values => {
             formData.append("brand", values.brand);
             formData.append("model", values.model);
-            formData.append("image", selectedImage);
+            formData.append("image", document.getElementById('image').files[0]);
             console.log(formData)
             console.log(selectedImage);
             RestService.updateObject(`/vehicle/${vehicleData.id}`, formData)
@@ -143,7 +145,6 @@ function VehicleUpdateModal({vehicleData}) {
                                     className="form-control"
                                     onChange={handleImageChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.image}
                                 />
                                 {formik.touched.image && formik.errors.image && (
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
@@ -163,7 +164,7 @@ function VehicleUpdateModal({vehicleData}) {
                                 <img
                                     alt="Not Found"
                                     width={"120px"}
-                                    // src={URL.createObjectURL(selectedImage)}
+                                    src={URL.createObjectURL(selectedImage)}
                                 />
                                 <br />
                                 <button class="btn btn-secondary btn-sm mb-2" onClick={() => setSelectedImage(undefined)}>Remove</button>
