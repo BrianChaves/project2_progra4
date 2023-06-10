@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import RestService from '../../services/rest-service';
 import { Link } from 'react-router-dom';
 import InsuranceCreateModal from './InsuranceCreateModal';
+import * as bootstrap from 'bootstrap/dist/js/bootstrap';
 
 function InsuranceListCreate() {
   const [insuranceList, setInsuranceList] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  })
 
   useEffect(() => {
       RestService.getObjectList('/insurance')
