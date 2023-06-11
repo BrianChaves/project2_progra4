@@ -81,7 +81,7 @@ const updateObject = async (path='', data={}) => {
 
 const deleteObject = async (path='') => {
     try {
-        const response = await axios.delete(path);
+        const response = axios.delete(path);
         return response.data;
     } catch (error) {
         console.log(error);

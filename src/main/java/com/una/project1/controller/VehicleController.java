@@ -80,6 +80,7 @@ public class VehicleController {
             @RequestParam("image") MultipartFile file
     ) throws IOException {
         Optional<Vehicle> existingVehicle = vehicleService.findById(vehicleId);
+        result = vehicleService.validateCreation(vehicle, file, result, "create");
         if (!existingVehicle.isPresent()) {
             result.rejectValue("vehicle", "error.Vehicle", "Vehicle not found.");
         }
