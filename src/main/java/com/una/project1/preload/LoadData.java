@@ -94,14 +94,14 @@ class LoadData {
             coverageCategoryRepository.save(coverageCategory5);
             Coverage coverage1 = new Coverage("Fire damage", "Fires started by natural causes.", 40000.0, 3.0, coverageCategory1);
             Coverage coverage2 = new Coverage("Flooding", "Sea or river flooding above wheel level.", 80000.0, 4.0, coverageCategory1);
-            Coverage coverage3 = new Coverage("Third-party Death/Injury", "Third-party injuries and death related to collisions with drivers or pedestrians.", 100000.0, 10.0, coverageCategory2);
+            Coverage coverage3 = new Coverage("Third-party Death-Injury", "Third-party injuries and death related to collisions with drivers or pedestrians.", 100000.0, 10.0, coverageCategory2);
             Coverage coverage4 = new Coverage("Property damage", "Third-party damage of property related to collisions.", 80000.0, 8.0, coverageCategory2);
             Coverage coverage5 = new Coverage("Collisions", "Collisions against other vehicles.", 60000.0, 3.5, coverageCategory3);
             Coverage coverage6 = new Coverage("Overturns", "Overturns related to road conditions or losing vehicle control.", 40000.0, 10.0, coverageCategory3);
             Coverage coverage7 = new Coverage("Car Theft", "Vehicle steal and subsequent damages.", 40000.0, 10.0, coverageCategory4);
             Coverage coverage8 = new Coverage("Car Hijacking", "Hijacking of vehicle while it's being driven or occupied.", 40000.0, 10.0, coverageCategory4);
             Coverage coverage9 = new Coverage("Hurricane", "Damages by impact of objects flying against the car or falling due to high winds or hurricanes.", 30000.0, 5.0, coverageCategory1);
-            Coverage coverage10 = new Coverage("Personal Death/Injury", "A death benefit is a payout to the beneficiary of a lifeBeneficiaries must submit proof of death and proof of the deceased’s coverage to the insurer to receive the benefit.", 70000.0, 5.0, coverageCategory5);
+            Coverage coverage10 = new Coverage("Personal Death-Injury", "A death benefit is a payout to the beneficiary of a lifeBeneficiaries must submit proof of death and proof of the deceased’s coverage to the insurer to receive the benefit.", 70000.0, 5.0, coverageCategory5);
             coverageRepository.save(coverage1);
             coverageRepository.save(coverage2);
             coverageRepository.save(coverage3);
