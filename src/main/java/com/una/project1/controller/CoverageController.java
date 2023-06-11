@@ -122,7 +122,7 @@ public class CoverageController {
         for (Insurance insurance : insuranceService.findAll()) {
             for(Coverage current_coverage: insurance.getCoverages()){
                 if (current_coverage.getId() == coverage.getId() ) {
-                    return ResponseEntity.ok().body("Coverage is associated with an insurance");
+                    return ResponseEntity.badRequest().body("Coverage is associated with an insurance");
                 }
             }
         }

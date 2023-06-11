@@ -8,7 +8,6 @@ function CoverageDeleteModal({ coverageData}) {
         event.preventDefault();
         RestService.deleteObject(`coverage/${coverageData.id}/delete`)
             .then((data) => {
-                console.log(data);
                 window.location.replace('/coverage/');
             })
             .catch((data) => {

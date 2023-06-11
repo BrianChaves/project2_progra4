@@ -70,7 +70,7 @@ public class PaymentController {
         Payment payment = optionalPayment.get();
         User paymentUser = payment.getUser();
         if (!authentication.getName().equals(paymentUser.getUsername())) {
-            return ResponseEntity.ok().body("Access denied");
+            return ResponseEntity.badRequest().body("Access denied");
         }
 
         return ResponseEntity.ok().body(optionalPayment.get());
@@ -87,7 +87,7 @@ public class PaymentController {
             return ResponseEntity.badRequest().body("Payment does not exist");
         }
         if (!authentication.getName().equals(existingPayment.get().getUser().getUsername())) {
-            return ResponseEntity.ok().body("Access denied");
+            return ResponseEntity.badRequest().body("Access denied");
         }
         paymentService.updatePayment(existingPayment.get(), updatedPayment);
         return ResponseEntity.ok().body(existingPayment.get());
@@ -104,10 +104,10 @@ public class PaymentController {
         }
         Payment payment = optionalPayment.get();
         if (!(authentication.getName().equals(payment.getUser().getUsername()))) {
-            return ResponseEntity.ok().body("Access denied");
+            return ResponseEntity.badRequest().body("Access denied");
         }
         if(payment.getInsurances().size() != 0){
-            return ResponseEntity.ok().body("Payment is linked with an insurance");
+            return ResponseEntity.badRequest().body("Payment is linked with an insurance");
         }
         paymentService.deleteById(payment.getId());
         return ResponseEntity.ok().body("Payment successfully deleted");
