@@ -7,6 +7,8 @@ import * as bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 function CoverageCreateModal() {
     const [coverageCategoryList, setCoverageCategoryList] = useState([]);
     const [createErrors, setCreateErrors] = useState([]);
+    const [error, setError] = useState("");
+
 
     useEffect(() => {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -48,12 +50,19 @@ function CoverageCreateModal() {
         onSubmit: values => {
             RestService.createObject('/coverage', {...values, coverageCategory: parseInt(values.coverageCategory)})
                 .then((data) => {
-                    window.location.reload();
+                    setError("")
                     setCreateErrors([]);
+                    window.location.reload();
+
                 })
                 .catch((data) => {
-                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-                    setCreateErrors(errors);
+                    if (Array.isArray(data)){
+                        const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                        setCreateErrors(errors);
+                    }
+                    else{
+                        setError(data);
+                    }
                 })
         },
     });
@@ -71,6 +80,11 @@ function CoverageCreateModal() {
 
 
                             <div>
+                                {error && (
+                                    <ul class="alert alert-danger ps-4">
+                                        <li>{error}</li>
+                                    </ul>
+                                )}
                                 <label htmlFor="name" className="form-label mb-0 mt-3">Name</label>
                                 <input
                                     id="name"
