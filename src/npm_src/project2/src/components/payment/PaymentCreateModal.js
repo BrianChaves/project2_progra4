@@ -4,7 +4,8 @@ import * as Yup from 'yup';
 import RestService from '../../services/rest-service';
 
 function PaymentCreateModal() {
-
+    const [createErrors, setCreateErrors] = useState([]);
+    const [error, setError] = useState("");
     const formik = useFormik({
         initialValues: {
             number: '',
@@ -33,9 +34,19 @@ function PaymentCreateModal() {
         onSubmit: values => {
             RestService.createObject('/payment', values)
                 .then((data) => {
+                    setError("")
+                    setCreateErrors([]);
                     window.location.reload();
                 })
-
+                .catch((data) => {
+                    if (Array.isArray(data)){
+                        const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                        setCreateErrors(errors);
+                    }
+                    else{
+                        setError(data);
+                    }
+                })
         },
     });
     return (
@@ -52,6 +63,11 @@ function PaymentCreateModal() {
 
 
                             <div>
+                                {error && (
+                                    <ul class="alert alert-danger ps-4">
+                                        <li>{error}</li>
+                                    </ul>
+                                )}
                                 <label htmlFor="number" className="form-label mb-0 mt-3">Card Number:</label>
                                 <input
                                     id="number"
@@ -67,7 +83,13 @@ function PaymentCreateModal() {
                                         <div className="error">{formik.errors.number}</div>
                                     </div>
                                 )}
-
+                                {createErrors.filter((error) => error.field === "number").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "number").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
 
                             <div>
@@ -85,6 +107,13 @@ function PaymentCreateModal() {
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                         <div className="error">{formik.errors.owner}</div>
                                     </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "owner").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "owner").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
 
@@ -104,6 +133,13 @@ function PaymentCreateModal() {
                                         <div className="error">{formik.errors.expirationDate}</div>
                                     </div>
                                 )}
+                                {createErrors.filter((error) => error.field === "expirationDate").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "expirationDate").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
 
                             <div>
@@ -121,6 +157,13 @@ function PaymentCreateModal() {
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                         <div className="error">{formik.errors.securityCode}</div>
                                     </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "securityCode").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "securityCode").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
 
@@ -140,6 +183,13 @@ function PaymentCreateModal() {
                                     <div className="alert alert-danger mb-0 mt-1 p-1 ps-4">
                                         <div className="error">{formik.errors.billingAddress}</div>
                                     </div>
+                                )}
+                                {createErrors.filter((error) => error.field === "billingAddress").length > 0 && (
+                                    <ul className="alert alert-danger ps-4">
+                                        {createErrors.filter((error) => error.field === "billingAddress").map((error) => (
+                                            <li>{error.message}</li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
 
