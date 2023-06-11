@@ -5,6 +5,7 @@ import RestService from '../../services/rest-service';
 
 function PaymentUpdateModal({ paymentData}) {
     const [createErrors, setCreateErrors] = useState([]);
+    const [error, setError] = useState("");
 
 
     const formik = useFormik({
@@ -39,8 +40,13 @@ function PaymentUpdateModal({ paymentData}) {
                     window.location.replace('/payment/');
                 })
                 .catch((data) => {
-                    const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
-                    setCreateErrors(errors);
+                    if (Array.isArray(data)){
+                        const errors = data.map((error) => ({field: error.field, message: error.defaultMessage}));
+                        setCreateErrors(errors);
+                    }
+                    else{
+                        setError(data);
+                    }
                 })
         },
     });
@@ -57,6 +63,11 @@ function PaymentUpdateModal({ paymentData}) {
 
 
                             <div>
+                                {error && (
+                                    <ul class="alert alert-danger ps-4">
+                                        <li>{error}</li>
+                                    </ul>
+                                )}
                                 <label htmlFor="number" className="form-label mb-0 mt-3">Card Number:</label>
                                 <input
                                     id="number"

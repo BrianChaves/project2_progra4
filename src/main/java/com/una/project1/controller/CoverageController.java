@@ -118,6 +118,7 @@ public class CoverageController {
         if (!optionalCoverage.isPresent()) {
             return ResponseEntity.badRequest().body("Coverage does not exist");       }
         Coverage coverage = optionalCoverage.get();
+
         for (Insurance insurance : insuranceService.findAll()) {
             for(Coverage current_coverage: insurance.getCoverages()){
                 if (current_coverage.getId() == coverage.getId() ) {
